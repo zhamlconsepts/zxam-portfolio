@@ -206,22 +206,22 @@ const Hero = ({ onOpenCV, t }) => {
           </div>
 
           {/* Right Column: Jamshid Portrait - ZOOMED IN, HEROIC, UNOBSTRUCTED BY TEXT */}
-          <div className="hero-portrait-entry lg:col-span-6 xl:col-span-6 relative flex flex-col justify-center items-center lg:items-end z-10 velocity-skew will-change-transform">
+          <div className="hero-portrait-entry lg:col-span-6 xl:col-span-6 relative flex flex-col justify-center items-center z-10 velocity-skew will-change-transform">
             {/* Ambient backlight */}
             <div className="absolute top-12 w-80 h-80 sm:w-[420px] sm:h-[420px] rounded-full bg-[#e60000]/25 blur-[120px] pointer-events-none" />
 
-            {/* Jamshid Portrait - Zoomed In (scale-120/125), High-Definition & Fully Clear */}
-            <div className="relative w-full max-w-md sm:max-w-lg lg:max-w-xl flex justify-center lg:justify-center overflow-visible pr-0 sm:pr-4">
+            {/* Jamshid Portrait Container */}
+            <div className="relative w-full max-w-[340px] sm:max-w-[420px] lg:max-w-[480px] xl:max-w-[520px] flex justify-center items-center overflow-visible">
               
-              {/* Giant Red "ZXAM" Typographic Backdrop Behind Portrait */}
+              {/* Giant Red "ZXAM" Typographic Backdrop - STRICTLY CONFINED TO PORTRAIT BACKDROP */}
               <div 
-                className="absolute top-[28%] sm:top-[30%] lg:top-[32%] left-[46%] sm:left-[47%] lg:left-[48%] -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none select-none flex flex-col items-center justify-center"
+                className="absolute top-[28%] sm:top-[30%] lg:top-[32%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full z-0 pointer-events-none select-none flex flex-col items-center justify-center text-center px-2"
                 aria-hidden="true"
               >
-                <span className="font-editorial font-black text-[#e60000] text-[115px] sm:text-[155px] md:text-[195px] lg:text-[220px] xl:text-[245px] leading-none tracking-tight uppercase select-none drop-shadow-[0_0_55px_rgba(230,0,0,0.95)] drop-shadow-[0_0_20px_rgba(230,0,0,0.85)] scale-y-105 whitespace-nowrap">
+                <span className="font-editorial font-black text-[#e60000] text-[80px] sm:text-[110px] md:text-[135px] lg:text-[150px] xl:text-[170px] leading-none tracking-tight uppercase select-none drop-shadow-[0_0_40px_rgba(230,0,0,0.9)] drop-shadow-[0_0_15px_rgba(230,0,0,0.85)] scale-y-105 whitespace-nowrap">
                   ZXAM
                 </span>
-                <span className="font-mono text-[10px] sm:text-xs text-[#e60000] tracking-[0.4em] uppercase -mt-2 sm:-mt-4 font-bold drop-shadow-[0_0_12px_rgba(230,0,0,0.9)]">
+                <span className="font-mono text-[9px] sm:text-[11px] text-[#e60000] tracking-[0.35em] uppercase mt-1 sm:mt-1.5 font-bold drop-shadow-[0_0_10px_rgba(230,0,0,0.9)]">
                   // IDENTITY: ZXAM
                 </span>
               </div>
@@ -229,13 +229,13 @@ const Hero = ({ onOpenCV, t }) => {
               <img
                 src="/assets/jamshid.png"
                 alt="Ablakimov Jamshid (zxam) - Junior Frontend Developer"
-                className="relative z-10 w-full h-auto max-h-[700px] sm:max-h-[780px] lg:max-h-[860px] scale-115 sm:scale-120 lg:scale-125 xl:scale-130 origin-bottom object-contain filter contrast-[1.05] drop-shadow-[0_25px_70px_rgba(0,0,0,0.98)] select-none pointer-events-none"
+                className="relative z-10 w-full h-auto max-h-[680px] sm:max-h-[760px] lg:max-h-[820px] scale-110 sm:scale-115 lg:scale-120 origin-bottom object-contain filter contrast-[1.05] drop-shadow-[0_25px_70px_rgba(0,0,0,0.98)] select-none pointer-events-none"
                 loading="eager"
               />
             </div>
 
             {/* Editorial Caption */}
-            <div className="mt-6 flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-zinc-400">
+            <div className="mt-6 flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-zinc-400 z-20">
               <span className="w-2 h-2 rounded-full bg-[#e60000]" />
               <span className="text-white font-bold">ABLAKIMOV JAMSHID (ZXAM)</span>
               <span className="text-zinc-600">//</span>
