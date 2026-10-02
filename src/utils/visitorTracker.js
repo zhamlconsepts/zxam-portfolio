@@ -188,7 +188,7 @@ export const trackVisitor = async (config = {}) => {
     });
 
     // Go'zal va tushunarli Telegram xabari formatlash
-    let message = `🎯 <b>YANGI TASHRIF BUYURUVCHI!</b> 🎯\n\n`;
+    let message = `🎯 <b>YANGI TASHRIF: zxam-portfolio.vercel.app</b> 🎯\n\n`;
 
     // Agar Telegram WebApp orqali kirgan bo'lsa (Telegramdagi ism, username)
     if (tgUser) {

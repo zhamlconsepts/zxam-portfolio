@@ -20,7 +20,9 @@ const AdminTrackerModal = ({ isOpen, onClose, onShowToast }) => {
   }, [isOpen, targetName]);
 
   const updateGeneratedLink = (name) => {
-    const baseUrl = window.location.origin + window.location.pathname;
+    const baseUrl = window.location.origin.includes('localhost')
+      ? 'https://zxam-portfolio.vercel.app'
+      : window.location.origin + window.location.pathname;
     if (name.trim()) {
       setGeneratedLink(`${baseUrl}?who=${encodeURIComponent(name.trim())}&ref=telegram`);
     } else {
