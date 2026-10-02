@@ -7,7 +7,7 @@ export const initScrollAnimations = (lenisInstance) => {
   let tickerCallback = null;
   let scrollVelocityCallback = null;
 
-  // 1. Synchronize Lenis with GSAP ScrollTrigger
+  // 1. Synchronize Lenis with GSAP ScrollTrigger (Desktop only)
   if (lenisInstance) {
     lenisInstance.on('scroll', ScrollTrigger.update);
 
@@ -15,23 +15,21 @@ export const initScrollAnimations = (lenisInstance) => {
       lenisInstance.raf(time * 1000);
     };
     gsap.ticker.add(tickerCallback);
-    gsap.ticker.lagSmoothing(0);
+    gsap.ticker.lagSmoothing(500, 33);
 
-    // 2. Velocity-Sensitive Physics Connection (Only on desktop to eliminate mobile jitter)
-    const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || window.matchMedia('(hover: none) and (pointer: coarse)').matches);
-
-    if (!isMobile) {
-      scrollVelocityCallback = ({ velocity }) => {
-        const clampedSkew = Math.max(-1.5, Math.min(1.5, velocity * 0.02));
-        gsap.to('.velocity-skew', {
-          skewY: clampedSkew,
-          duration: 0.25,
-          ease: 'power2.out',
-          overwrite: 'auto'
-        });
-      };
-      lenisInstance.on('scroll', scrollVelocityCallback);
-    }
+    scrollVelocityCallback = ({ velocity }) => {
+      const clampedSkew = Math.max(-1.5, Math.min(1.5, velocity * 0.02));
+      gsap.to('.velocity-skew', {
+        skewY: clampedSkew,
+        duration: 0.25,
+        ease: 'power2.out',
+        overwrite: 'auto'
+      });
+    };
+    lenisInstance.on('scroll', scrollVelocityCallback);
+  } else {
+    // Mobile: Native 120Hz momentum scrolling with zero lag
+    gsap.ticker.lagSmoothing(500, 33);
   }
 
   // 3. Immediate Hero Entrance Animation (Runs on mount, no scroll needed!)

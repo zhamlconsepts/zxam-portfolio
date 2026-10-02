@@ -169,8 +169,8 @@ const LiquidInkBackground = () => {
       gl.STATIC_DRAW
     );
 
-    const MAX_DROPS = 550;
-    const vertexArray = new Float32Array(MAX_DROPS * 6 * 6);
+    const BUFFER_CAPACITY = 250;
+    const vertexArray = new Float32Array(BUFFER_CAPACITY * 6 * 6);
     const dropBuffer = gl.createBuffer();
 
     let fboWidth = Math.floor(width * 0.75);
@@ -210,75 +210,81 @@ const LiquidInkBackground = () => {
     // Active drops pool managed by GSAP
     const drops = [];
 
+    const isMobile = typeof window !== 'undefined' && 
+      (window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth < 768);
+
+    const MAX_DROPS = isMobile ? 20 : 80;
+
     let lastDocX = null;
     let lastDocY = null;
     let lastTime = 0;
 
     /**
      * Generates a signature noth.in Viscous Liquid Dripping Splatter Cluster
-     * - Central mass pool (scaled down to ~60px-88px for refined elegance)
-     * - Long vertical dripping stalactites with bulbous teardrop heads hanging down
-     * - Upward & diagonal splash horns stretching outward
-     * - Detached satellite tear beads
-     * - Animated organically with GSAP (expansion -> swirl -> slow dissolution over 1.5 - 1.8s)
      */
-    const spawnDrippingCluster = (cx, cy, baseRadius, vx, vy) => {
+    const spawnDrippingCluster = (cx, cy, baseRadius, vx, vy, isTouch = false) => {
       const clusterItems = [];
 
-      // 1. Central Molten Core (scaled down to baseRadius 60px - 88px)
+      // 1. Central Molten Core
       clusterItems.push({
         x: cx,
         y: cy,
-        targetRadius: baseRadius,
-        initialRadius: baseRadius * 0.35
+        targetRadius: isTouch ? baseRadius * 0.75 : baseRadius,
+        initialRadius: isTouch ? baseRadius * 0.35 : baseRadius * 0.35
       });
 
-      // 2. Continuous Vertical Dripping Tendrils (firmly unified with central mass)
-      const numDrips = 2 + Math.floor(Math.random() * 2);
-      for (let i = 0; i < numDrips; i++) {
-        const xOffset = (i - (numDrips - 1) / 2) * (baseRadius * 0.38);
-        const dripLength = baseRadius * (0.50 + Math.random() * 0.40);
-        const tipRadius = baseRadius * (0.35 + Math.random() * 0.12);
+      if (!isTouch) {
+        // Desktop: Heavy Vertical Dripping Stalactites (Exact noth.in signature style)
+        const numDrips = 2 + Math.floor(Math.random() * 2);
+        for (let i = 0; i < numDrips; i++) {
+          const xOffset = (i - (numDrips - 1) / 2) * (baseRadius * 0.38);
+          const dripLength = baseRadius * (0.50 + Math.random() * 0.40);
+          const tipRadius = baseRadius * (0.35 + Math.random() * 0.12);
 
-        // Continuous neck bridge (generous radius so it never pinches off into isolated circles)
+          clusterItems.push({
+            x: cx + xOffset * 0.7,
+            y: cy + dripLength * 0.5,
+            targetRadius: baseRadius * 0.45,
+            initialRadius: baseRadius * 0.2
+          });
+
+          clusterItems.push({
+            x: cx + xOffset,
+            y: cy + dripLength,
+            targetRadius: tipRadius,
+            initialRadius: tipRadius * 0.25
+          });
+        }
+
+        // Upward & Diagonal Splash Tendrils
+        const numHorns = 2;
+        for (let j = 0; j < numHorns; j++) {
+          const hornAngle =
+            -Math.PI * 0.5 + (j === 0 ? -0.65 : 0.65) + (Math.random() - 0.5) * 0.2;
+          const hornLength = baseRadius * (0.45 + Math.random() * 0.35);
+          const hornRadius = baseRadius * (0.32 + Math.random() * 0.10);
+
+          clusterItems.push({
+            x: cx + Math.cos(hornAngle) * hornLength * 0.55,
+            y: cy + Math.sin(hornAngle) * hornLength * 0.55,
+            targetRadius: baseRadius * 0.38,
+            initialRadius: baseRadius * 0.18
+          });
+
+          clusterItems.push({
+            x: cx + Math.cos(hornAngle) * hornLength,
+            y: cy + Math.sin(hornAngle) * hornLength,
+            targetRadius: hornRadius,
+            initialRadius: hornRadius * 0.22
+          });
+        }
+      } else {
+        // Mobile: Lightweight Smooth Fluid Aura (120fps hardware fluidity)
         clusterItems.push({
-          x: cx + xOffset * 0.7,
-          y: cy + dripLength * 0.5,
-          targetRadius: baseRadius * 0.45,
+          x: cx + (vx ? vx * 0.12 : 0),
+          y: cy + (vy ? vy * 0.12 : 0),
+          targetRadius: baseRadius * 0.5,
           initialRadius: baseRadius * 0.2
-        });
-
-        // Bulbous teardrop head at bottom of drip
-        clusterItems.push({
-          x: cx + xOffset,
-          y: cy + dripLength,
-          targetRadius: tipRadius,
-          initialRadius: tipRadius * 0.25
-        });
-      }
-
-      // 3. Upward & Diagonal Splash Tendrils (firmly attached)
-      const numHorns = 2;
-      for (let j = 0; j < numHorns; j++) {
-        const hornAngle =
-          -Math.PI * 0.5 + (j === 0 ? -0.65 : 0.65) + (Math.random() - 0.5) * 0.2;
-        const hornLength = baseRadius * (0.45 + Math.random() * 0.35);
-        const hornRadius = baseRadius * (0.32 + Math.random() * 0.10);
-
-        // Mid-horn bridge (thick enough to remain 100% attached)
-        clusterItems.push({
-          x: cx + Math.cos(hornAngle) * hornLength * 0.55,
-          y: cy + Math.sin(hornAngle) * hornLength * 0.55,
-          targetRadius: baseRadius * 0.38,
-          initialRadius: baseRadius * 0.18
-        });
-
-        // Horn tip
-        clusterItems.push({
-          x: cx + Math.cos(hornAngle) * hornLength,
-          y: cy + Math.sin(hornAngle) * hornLength,
-          targetRadius: hornRadius,
-          initialRadius: hornRadius * 0.22
         });
       }
 
@@ -289,7 +295,7 @@ const LiquidInkBackground = () => {
           y: item.y,
           radius: item.initialRadius,
           maxRadius: item.targetRadius,
-          weight: 0.9,
+          weight: 0.85,
           swirlX: 0,
           swirlY: 0
         };
@@ -297,29 +303,28 @@ const LiquidInkBackground = () => {
         drops.push(drop);
 
         // GSAP Physics Dynamics:
-        // A) Organically expand into full molten liquid volume
         gsap.to(drop, {
           radius: drop.maxRadius,
           weight: 1.0,
-          duration: 0.26,
+          duration: isTouch ? 0.18 : 0.26,
           ease: 'power2.out'
         });
 
-        // B) Swirl & fluid drag
-        gsap.to(drop, {
-          swirlX: (Math.random() - 0.5) * 10,
-          swirlY: (Math.random() - 0.2) * 14, // subtle downward gravity drift
-          duration: 1.6,
-          ease: 'sine.out'
-        });
+        if (!isTouch) {
+          gsap.to(drop, {
+            swirlX: (Math.random() - 0.5) * 10,
+            swirlY: (Math.random() - 0.2) * 14,
+            duration: 1.6,
+            ease: 'sine.out'
+          });
+        }
 
-        // C) Slowly dissolve / fade back to normal after 1.4 - 1.8 seconds
-        const dissolveDuration = 1.35 + Math.random() * 0.35;
+        const dissolveDuration = isTouch ? 0.65 : (1.35 + Math.random() * 0.35);
         gsap.to(drop, {
           weight: 0.0,
-          radius: drop.maxRadius * 0.3, // surface-tension shrinkage
+          radius: drop.maxRadius * 0.2,
           duration: dissolveDuration,
-          delay: 0.28, // stays solid liquid before evaporating
+          delay: isTouch ? 0.10 : 0.28,
           ease: 'power2.inOut',
           onComplete: () => {
             const idx = drops.indexOf(drop);
@@ -334,7 +339,7 @@ const LiquidInkBackground = () => {
       }
     };
 
-    const addLiquidImpulse = (clientX, clientY, isForced = false) => {
+    const addLiquidImpulse = (clientX, clientY, isForced = false, isTouch = false) => {
       const scrollY = window.scrollY || window.pageYOffset || 0;
       const docX = clientX;
       const docY = clientY + scrollY;
@@ -344,7 +349,7 @@ const LiquidInkBackground = () => {
         lastDocX = docX;
         lastDocY = docY;
         lastTime = now;
-        spawnDrippingCluster(docX, docY, 70, 0, 0);
+        spawnDrippingCluster(docX, docY, isTouch ? 45 : 70, 0, 0, isTouch);
         return;
       }
 
@@ -353,21 +358,25 @@ const LiquidInkBackground = () => {
       const dist = Math.hypot(dx, dy);
       const dt = Math.max(1, now - lastTime);
 
-      if (dist < 15 && !isForced && dt < 65) return;
+      const minDist = isTouch ? 24 : 15;
+      const minDt = isTouch ? 80 : 65;
+
+      if (dist < minDist && !isForced && dt < minDt) return;
 
       const speed = dist / dt; // px/ms
-      // Dynamic base radius scaled down: 60px to 88px (refined, non-intrusive)
-      const baseRadius = Math.max(60, Math.min(88, 88 - Math.min(speed * 12, 28)));
+      const baseRadius = isTouch
+        ? 45
+        : Math.max(60, Math.min(88, 88 - Math.min(speed * 12, 28)));
 
-      // Step interpolation: spawn clusters along path every 28px
-      const stepSize = 28;
-      const steps = Math.max(1, Math.min(Math.ceil(dist / stepSize), 8));
+      const stepSize = isTouch ? 50 : 28;
+      const maxSteps = isTouch ? 3 : 8;
+      const steps = Math.max(1, Math.min(Math.ceil(dist / stepSize), maxSteps));
 
       for (let i = 1; i <= steps; i++) {
         const t = i / steps;
         const curX = lastDocX + dx * t;
         const curY = lastDocY + dy * t;
-        spawnDrippingCluster(curX, curY, baseRadius, dx, dy);
+        spawnDrippingCluster(curX, curY, baseRadius, dx, dy, isTouch);
       }
 
       lastDocX = docX;
@@ -375,17 +384,17 @@ const LiquidInkBackground = () => {
       lastTime = now;
     };
 
-    const onMouseMove = (e) => addLiquidImpulse(e.clientX, e.clientY);
-    const onMouseDown = (e) => addLiquidImpulse(e.clientX, e.clientY, true);
+    const onMouseMove = (e) => addLiquidImpulse(e.clientX, e.clientY, false, false);
+    const onMouseDown = (e) => addLiquidImpulse(e.clientX, e.clientY, true, false);
 
     const onTouchMove = (e) => {
       if (e.touches && e.touches[0]) {
-        addLiquidImpulse(e.touches[0].clientX, e.touches[0].clientY);
+        addLiquidImpulse(e.touches[0].clientX, e.touches[0].clientY, false, true);
       }
     };
     const onTouchStart = (e) => {
       if (e.touches && e.touches[0]) {
-        addLiquidImpulse(e.touches[0].clientX, e.touches[0].clientY, true);
+        addLiquidImpulse(e.touches[0].clientX, e.touches[0].clientY, true, true);
       }
     };
 

@@ -50,9 +50,11 @@
 
   /* Native touch behavior on mobile phones and tablets */
   @media (hover: none) and (pointer: coarse) {
-    html, body, #root, #app-root, * {
+    html, body, #root, #app-root {
       cursor: auto !important;
       -webkit-tap-highlight-color: transparent;
+      touch-action: pan-y !important;
+      -webkit-overflow-scrolling: touch !important;
     }
     input, textarea {
       -webkit-user-select: text !important;

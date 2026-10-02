@@ -68,16 +68,20 @@ function App() {
     window.addEventListener('keydown', handleFirstGesture, { passive: true });
     window.addEventListener('wheel', handleFirstGesture, { passive: true });
 
-    const lenis = new Lenis({
-      duration: 1.15,
-      easing: (val) => Math.min(1, 1.001 - Math.pow(2, -10 * val)),
-      smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.0,
-      syncTouch: false, // Prevents Lenis from fighting native mobile touch physics
-    });
+    const isMobile = typeof window !== 'undefined' &&
+      (window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth < 768);
 
-    lenisRef.current = lenis;
+    let lenis = null;
+
+    if (!isMobile) {
+      lenis = new Lenis({
+        duration: 1.15,
+        easing: (val) => Math.min(1, 1.001 - Math.pow(2, -10 * val)),
+        smoothWheel: true,
+        wheelMultiplier: 1.0,
+      });
+      lenisRef.current = lenis;
+    }
 
     let cleanupAnimations = () => {};
     // Ensure all DOM elements are mounted before initializing GSAP triggers
