@@ -93,8 +93,14 @@ const AdminTrackerModal = ({ isOpen, onClose, onShowToast }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn">
-      <div className="relative w-full max-w-2xl bg-[#0d0d11] border border-white/15 rounded-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl text-white">
+    <div
+      data-lenis-prevent="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-black/85 backdrop-blur-md animate-fadeIn"
+    >
+      <div
+        data-lenis-prevent="true"
+        className="relative w-full max-w-2xl bg-[#0d0d11] border border-white/15 rounded-2xl p-6 sm:p-8 max-h-[90vh] overflow-y-auto shadow-2xl text-white custom-scrollbar overscroll-contain touch-pan-y"
+      >
         
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">

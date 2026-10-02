@@ -11,6 +11,7 @@ export const ProjectModal = ({ project, onClose, lang, t }) => {
       className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
       role="dialog"
       aria-modal="true"
+      data-lenis-prevent="true"
     >
       <div
         className="fixed inset-0 bg-[#0b0b0b]/90 backdrop-blur-md transition-opacity duration-300 cursor-pointer"
@@ -18,9 +19,13 @@ export const ProjectModal = ({ project, onClose, lang, t }) => {
           playClickSound();
           onClose();
         }}
+        data-lenis-prevent="true"
       />
 
-      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0b0b0b] border border-[#ffffff]/20 shadow-[0_25px_60px_rgba(0,0,0,0.95)] z-20 p-6 sm:p-10 animate-modal-zoom custom-scrollbar font-mono text-xs">
+      <div
+        data-lenis-prevent="true"
+        className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0b0b0b] border border-[#ffffff]/20 shadow-[0_25px_60px_rgba(0,0,0,0.95)] z-20 p-6 sm:p-10 animate-modal-zoom custom-scrollbar font-mono text-xs overscroll-contain touch-pan-y"
+      >
         {/* Close Button */}
         <button
           onClick={() => {
@@ -137,6 +142,7 @@ export const CVModal = ({ isOpen, onClose, t }) => {
       className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
       role="dialog"
       aria-modal="true"
+      data-lenis-prevent="true"
     >
       <div
         className="fixed inset-0 bg-[#0b0b0b]/90 backdrop-blur-md transition-opacity duration-300 cursor-pointer"
@@ -144,9 +150,13 @@ export const CVModal = ({ isOpen, onClose, t }) => {
           playClickSound();
           onClose();
         }}
+        data-lenis-prevent="true"
       />
 
-      <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto bg-[#0b0b0b] border border-[#ffffff]/20 shadow-[0_25px_60px_rgba(0,0,0,0.95)] z-20 p-5 sm:p-10 animate-modal-zoom custom-scrollbar print-modal-area font-mono text-xs">
+      <div
+        data-lenis-prevent="true"
+        className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto bg-[#0b0b0b] border border-[#ffffff]/20 shadow-[0_25px_60px_rgba(0,0,0,0.95)] z-20 p-5 sm:p-10 animate-modal-zoom custom-scrollbar print-modal-area font-mono text-xs overscroll-contain touch-pan-y"
+      >
         {/* Close Button */}
         <button
           onClick={() => {

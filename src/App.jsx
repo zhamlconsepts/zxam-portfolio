@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 import LiquidInkBackground from './components/LiquidInkBackground';
 import InversionCursor from './components/InversionCursor';
@@ -30,6 +30,8 @@ function App() {
   const [toast, setToast] = useState({ visible: false, message: '' });
   const [scrollProgress, setScrollProgress] = useState(0);
 
+  const lenisRef = useRef(null);
+
   const t = translations[lang] || translations.uz;
 
   // Auto visitor tracking to Telegram Bot
@@ -42,6 +44,16 @@ function App() {
       setAdminModalOpen(true);
     }
   }, []);
+
+  // Modal open / close handling: pause background Lenis scroll and allow inner modal card scrolling
+  const isAnyModalOpen = Boolean(selectedProject || cvModalOpen || adminModalOpen);
+  useEffect(() => {
+    if (isAnyModalOpen) {
+      lenisRef.current?.stop();
+    } else {
+      lenisRef.current?.start();
+    }
+  }, [isAnyModalOpen]);
 
   // Butter-Smooth Inertia Scroll (Lenis) + Granular Ambient Scroll Audio + GSAP Animations
   useEffect(() => {
@@ -64,6 +76,8 @@ function App() {
       touchMultiplier: 1.0,
       syncTouch: false, // Prevents Lenis from fighting native mobile touch physics
     });
+
+    lenisRef.current = lenis;
 
     let cleanupAnimations = () => {};
     // Ensure all DOM elements are mounted before initializing GSAP triggers
@@ -99,6 +113,7 @@ function App() {
     return () => {
       clearTimeout(animTimer);
       lenis.destroy();
+      lenisRef.current = null;
       cleanupAnimations();
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('keydown', handleKeyDown);
