@@ -11,6 +11,7 @@ import Skills from './components/Skills';
 import Projects from './components/Projects';
 import Experience from './components/Experience';
 import Contact from './components/Contact';
+import ReviewsSection from './components/ReviewsSection';
 import Footer from './components/Footer';
 import { ProjectModal, CVModal } from './components/Modals';
 import AdminTrackerModal from './components/AdminTrackerModal';
@@ -29,6 +30,7 @@ function App() {
   const [cvModalOpen, setCvModalOpen] = useState(false);
   const [adminModalOpen, setAdminModalOpen] = useState(false);
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  const [reviewsVersion, setReviewsVersion] = useState(0);
   const [toast, setToast] = useState({ visible: false, message: '' });
   const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -205,6 +207,7 @@ function App() {
         <Projects onSelectProject={(p) => setSelectedProject(p)} lang={lang} t={t} />
         <Experience lang={lang} t={t} />
         <Contact onShowToast={showToast} onOpenRating={() => setRatingModalOpen(true)} t={t} />
+        <ReviewsSection onOpenRating={() => setRatingModalOpen(true)} reviewsVersion={reviewsVersion} />
       </main>
 
       {/* Footer */}
@@ -229,6 +232,7 @@ function App() {
         isOpen={ratingModalOpen}
         onClose={() => setRatingModalOpen(false)}
         onShowToast={showToast}
+        onReviewSubmitted={() => setReviewsVersion((v) => v + 1)}
         lang={lang}
       />
 

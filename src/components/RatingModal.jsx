@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Star, Heart, ThumbsUp, Sparkles, Send, Check, MessageSquare } from 'lucide-react';
+import { X, Star, Heart, ThumbsUp, Sparkles, Send, Check, MessageSquare, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { sendTelegramNotification } from '../utils/visitorTracker';
 import { playClickSound, playSuccessSound } from '../utils/audio';
+import { hasUserVoted, getUserReview, saveUserReview } from '../utils/reviewsData';
 
 const RATING_LABELS = {
   1: "Yaxshilash kerak",
@@ -19,21 +20,26 @@ const QUICK_TAGS = [
   '🚀 Hamkorlikka Tayyorman'
 ];
 
-const RatingModal = ({ isOpen, onClose, onShowToast, lang = 'uz' }) => {
+const RatingModal = ({ isOpen, onClose, onShowToast, onReviewSubmitted, lang = 'uz' }) => {
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [selectedTags, setSelectedTags] = useState(['🔥 Ajoyib Dizayn', '⚡️ Ultra Tezkor']);
   const [visitorName, setVisitorName] = useState('');
   const [comment, setComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
+  const [alreadyVoted, setAlreadyVoted] = useState(false);
+  const [existingReview, setExistingReview] = useState(null);
+  const [justSubmitted, setJustSubmitted] = useState(false);
 
   useEffect(() => {
-    const savedRating = localStorage.getItem('zxam_portfolio_rating_submitted');
-    if (savedRating) {
-      setHasSubmitted(true);
+    if (isOpen) {
+      const voted = hasUserVoted();
+      setAlreadyVoted(voted);
+      if (voted) {
+        setExistingReview(getUserReview());
+      }
     }
-  }, []);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -44,9 +50,27 @@ const RatingModal = ({ isOpen, onClose, onShowToast, lang = 'uz' }) => {
     );
   };
 
+  const handleScrollToReviews = () => {
+    playClickSound();
+    onClose();
+    setTimeout(() => {
+      const el = document.getElementById('reviews');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 200);
+  };
+
   const handleSubmit = async (e) => {
     e?.preventDefault();
     if (rating === 0) return;
+
+    // Tekshirish: agar allaqachon baholagan bo'lsa, qayta yuborishga yo'l qo'ymaslik
+    if (hasUserVoted()) {
+      onShowToast?.('⚠️ Bitta foydalanuvchi faqat 1 ta baho qoldira oladi.');
+      setAlreadyVoted(true);
+      return;
+    }
 
     playSuccessSound();
     setIsSubmitting(true);
@@ -55,6 +79,15 @@ const RatingModal = ({ isOpen, onClose, onShowToast, lang = 'uz' }) => {
     const starsString = '⭐️'.repeat(activeRating);
     const timeString = new Date().toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' });
 
+    // 1. Mahalliy xotiraga (va sayt pastidagi ro'yxatga) saqlash
+    const savedReview = saveUserReview({
+      name: visitorName,
+      rating: activeRating,
+      tags: selectedTags,
+      comment: comment,
+    });
+
+    // 2. Telegram Botga to'liq formatlangan hisobot yuborish
     let message = `🌟 <b>YANGI PORTFOLIO BAHOSI!</b> 🌟\n\n`;
     message += `👤 <b>Baholovchi:</b> ⭐️ <b>${visitorName.trim() || 'Mehmon'}</b>\n`;
     message += `⭐️ <b>Baho:</b> ${starsString} (${activeRating} / 5 - ${RATING_LABELS[activeRating]})\n`;
@@ -73,9 +106,12 @@ const RatingModal = ({ isOpen, onClose, onShowToast, lang = 'uz' }) => {
     await sendTelegramNotification(message);
 
     setIsSubmitting(false);
-    setHasSubmitted(true);
-    localStorage.setItem('zxam_portfolio_rating_submitted', activeRating.toString());
-    onShowToast?.('⭐️ Katta rahmat! Bahoyingiz Jamshidga muvaffaqiyatli yetkazildi.');
+    setJustSubmitted(true);
+    setAlreadyVoted(true);
+    setExistingReview(savedReview);
+
+    onReviewSubmitted?.(savedReview);
+    onShowToast?.('⭐️ Katta rahmat! Bahoyingiz saytda va Telegramda saqlandi.');
   };
 
   return (
@@ -119,36 +155,123 @@ const RatingModal = ({ isOpen, onClose, onShowToast, lang = 'uz' }) => {
               PORTFOLIONI BAHOLASH <span className="text-[10px] font-mono py-0.5 px-2 bg-[#e60000] text-white rounded">FEEDBACK</span>
             </h3>
             <p className="text-xs text-zinc-400 font-sans">
-              Sayt dizayni va tajribasiga o'z bahoingizni qoldiring
+              1 foydalanuvchi = 1 ta xolis baholash
             </p>
           </div>
         </div>
 
-        {/* Content */}
-        {hasSubmitted ? (
-          <div className="py-8 text-center space-y-4">
-            <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.2)]">
+        {/* HOLAT 1: FOYDALANUVCHI ALLAQACHON BAHO QO'YGAN (1 user = 1 baho qoidasi) */}
+        {alreadyVoted && !justSubmitted ? (
+          <div className="py-4 space-y-6">
+            <div className="p-5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-center space-y-3">
+              <div className="w-12 h-12 mx-auto rounded-full bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <h4 className="font-editorial text-xl font-bold text-white uppercase">
+                SIZ ALLAQACHON BAHOLAGANSIZ!
+              </h4>
+              <p className="text-xs text-zinc-300 font-sans max-w-sm mx-auto">
+                Bitta foydalanuvchi faqat 1 marta baho qoldira oladi. Sizning bahoingiz qabul qilingan va saytning pastki qismida aks etgan.
+              </p>
+            </div>
+
+            {/* Displaying User's Previous Review */}
+            {existingReview && (
+              <div className="p-4 rounded-xl bg-white/[0.03] border border-white/10 space-y-2.5 font-mono text-xs">
+                <div className="flex items-center justify-between text-zinc-400 text-[11px]">
+                  <span>// SIZNING QOLDIRGAN BAHONGIZ:</span>
+                  <span>{existingReview.date || 'Yaqinda'}</span>
+                </div>
+
+                <div className="flex items-center gap-1.5 py-1">
+                  {[1, 2, 3, 4, 5].map((s) => (
+                    <Star
+                      key={s}
+                      className={`w-5 h-5 ${
+                        s <= (existingReview.rating || 5)
+                          ? 'fill-amber-400 text-amber-400'
+                          : 'text-zinc-700'
+                      }`}
+                    />
+                  ))}
+                  <span className="ml-2 font-bold text-white">
+                    {existingReview.rating || 5} / 5
+                  </span>
+                </div>
+
+                {existingReview.tags && existingReview.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 pt-1">
+                    {existingReview.tags.map((t, i) => (
+                      <span key={i} className="px-2 py-0.5 rounded bg-white/5 text-[10px] text-zinc-300">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {existingReview.comment && (
+                  <p className="text-xs font-sans text-zinc-300 italic pt-1 border-t border-white/10">
+                    "{existingReview.comment}"
+                  </p>
+                )}
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                type="button"
+                onClick={handleScrollToReviews}
+                className="flex-1 py-3 bg-[#e60000] hover:bg-[#ff1a1a] text-white font-mono text-xs uppercase font-bold rounded-xl transition-colors cursor-pointer text-center"
+              >
+                BARCHA BAHOLARNI KO'RISH
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  playClickSound();
+                  onClose();
+                }}
+                className="py-3 px-6 rounded-xl border border-white/20 hover:border-white text-zinc-300 font-mono text-xs uppercase transition-colors cursor-pointer"
+              >
+                YOPISH
+              </button>
+            </div>
+          </div>
+        ) : justSubmitted ? (
+          /* HOLAT 2: HOZIRGINA YUBORILDI */
+          <div className="py-8 text-center space-y-5">
+            <div className="w-16 h-16 mx-auto rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_25px_rgba(16,185,129,0.3)]">
               <Check className="w-8 h-8" />
             </div>
             <div>
               <h4 className="font-editorial text-2xl font-bold text-white uppercase">
                 TASHAKKUR!
               </h4>
-              <p className="text-xs text-zinc-400 font-sans mt-1 max-w-sm mx-auto">
-                Sizning fikringiz va bahoyingiz men uchun juda qadrli. Jamshidga to'g'ridan-to'g'ri yetkazildi!
+              <p className="text-xs text-zinc-300 font-sans mt-2 max-w-sm mx-auto leading-relaxed">
+                Sizning bahoingiz Jamshidga yetkazildi va saytning pastki qismidagi <strong>"SAYT BAHOLARI"</strong> bo'limida muvaffaqiyatli saqlandi!
               </p>
             </div>
-            <button
-              onClick={() => {
-                playClickSound();
-                onClose();
-              }}
-              className="px-6 py-3 bg-[#e60000] hover:bg-[#ff1a1a] text-white font-mono text-xs uppercase font-bold rounded-lg transition-colors cursor-pointer"
-            >
-              YOPISH
-            </button>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+              <button
+                onClick={handleScrollToReviews}
+                className="px-6 py-3 bg-[#e60000] hover:bg-[#ff1a1a] text-white font-mono text-xs uppercase font-bold rounded-xl transition-colors cursor-pointer"
+              >
+                SAYTDA KO'RISH
+              </button>
+              <button
+                onClick={() => {
+                  playClickSound();
+                  onClose();
+                }}
+                className="px-6 py-3 border border-white/20 hover:border-white text-zinc-300 font-mono text-xs uppercase rounded-xl transition-colors cursor-pointer"
+              >
+                YOPISH
+              </button>
+            </div>
           </div>
         ) : (
+          /* HOLAT 3: BIRINCHI MARTA BAHO QO'YISH FORMASI */
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Interactive Star Rating */}
@@ -169,7 +292,7 @@ const RatingModal = ({ isOpen, onClose, onShowToast, lang = 'uz' }) => {
                     <Star
                       className={`w-8 h-8 sm:w-9 sm:h-9 transition-colors ${
                         (hoverRating || rating) >= star
-                          ? 'fill-[#e60000] text-[#e60000] drop-shadow-[0_0_10px_rgba(230,0,0,0.6)]'
+                          ? 'fill-amber-400 text-amber-400 drop-shadow-[0_0_12px_rgba(251,191,36,0.6)]'
                           : 'text-zinc-700 hover:text-zinc-500'
                       }`}
                     />
@@ -226,7 +349,7 @@ const RatingModal = ({ isOpen, onClose, onShowToast, lang = 'uz' }) => {
             {/* Comment or Message */}
             <div className="space-y-1.5">
               <label className="block font-mono text-xs text-zinc-400 uppercase tracking-wider">
-                // FIKR-MULOHAZA YOKI TAKLIFINGIZ (Ixtiyoriy):
+                // FIKR-MULOHAZA YOKI IZOHINGIZ (Ixtiyoriy):
               </label>
               <textarea
                 rows={3}
@@ -237,6 +360,12 @@ const RatingModal = ({ isOpen, onClose, onShowToast, lang = 'uz' }) => {
               />
             </div>
 
+            {/* Note: Single Vote Rule */}
+            <div className="flex items-center gap-2 text-[11px] font-mono text-zinc-500">
+              <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Eslatma: Har bir tashrifchi faqat 1 ta baho qoldirishi mumkin.</span>
+            </div>
+
             {/* Submit Button */}
             <button
               type="submit"
@@ -244,7 +373,7 @@ const RatingModal = ({ isOpen, onClose, onShowToast, lang = 'uz' }) => {
               className="w-full py-3.5 bg-[#e60000] hover:bg-[#ff1a1a] text-white font-mono text-xs uppercase font-bold rounded-xl transition-all shadow-lg hover:shadow-[0_0_20px_rgba(230,0,0,0.4)] flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
             >
               <Send className="w-4 h-4" />
-              <span>{isSubmitting ? 'Yuborilmoqda...' : 'BAHONI YUBORISH'}</span>
+              <span>{isSubmitting ? 'Yuborilmoqda...' : 'BAHONI TASDIQLASH VA YUBORISH'}</span>
             </button>
           </form>
         )}
