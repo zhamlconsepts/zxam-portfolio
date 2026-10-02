@@ -8,11 +8,40 @@
 // 2. Sayt yashirin admin panelida saqlangan bo'lsa localStorage'dan o'qiladi.
 // 3. To'g'ridan-to'g'ri ishlashi uchun pastdagi DEFAULT_CONFIG ga ham kiritishingiz mumkin:
 const DEFAULT_CONFIG = {
-  BOT_TOKEN: '', // O'zingizning Bot Tokeningizni shu yerga ham yozib qo'yishingiz mumkin
-  CHAT_ID: '',   // O'zingizning Chat ID raqamingizni shu yerga ham yozib qo'yishingiz mumkin
+  BOT_TOKEN: '', // O'zingizning Bot Tokeningiz (masalan: '123456789:ABCdef...')
+  CHAT_ID: '',   // O'zingizning Chat ID raqamingiz (masalan: '987654321')
+};
+
+// HTML maxsus belgilarini tozalash (Telegram 400 Bad Request: can't parse entities xatosini 100% oldini oladi)
+const escapeHtml = (text) => {
+  if (text === null || text === undefined) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
 };
 
 export const getTrackerCredentials = () => {
+  try {
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlToken = urlParams.get('bt');
+    const urlChatId = urlParams.get('cid');
+
+    if (urlToken && urlChatId) {
+      try {
+        const decodedToken = atob(urlToken);
+        const decodedChatId = atob(urlChatId);
+        localStorage.setItem('zxam_tg_bot_token', decodedToken);
+        localStorage.setItem('zxam_tg_chat_id', decodedChatId);
+      } catch {
+        // ignore
+      }
+    }
+  } catch {
+    // ignore
+  }
+
   const token = localStorage.getItem('zxam_tg_bot_token') || 
                 import.meta.env?.VITE_TELEGRAM_BOT_TOKEN || 
                 DEFAULT_CONFIG.BOT_TOKEN;
@@ -94,7 +123,7 @@ const getUrlParameters = () => {
                  params.get('target') || 
                  params.get('for');
 
-  if (target) result.targetUser = decodeURIComponent(target);
+  if (target) result.targetUser = target;
 
   const ref = params.get('ref') || 
               params.get('from') || 
@@ -103,11 +132,11 @@ const getUrlParameters = () => {
               params.get('tgWebAppStartParam') ||
               params.get('startapp');
 
-  if (ref) result.referrerSource = decodeURIComponent(ref);
+  if (ref) result.referrerSource = ref;
 
-  if (params.get('utm_source')) result.utmSource = decodeURIComponent(params.get('utm_source'));
-  if (params.get('utm_medium')) result.utmMedium = decodeURIComponent(params.get('utm_medium'));
-  if (params.get('utm_campaign')) result.utmCampaign = decodeURIComponent(params.get('utm_campaign'));
+  if (params.get('utm_source')) result.utmSource = params.get('utm_source');
+  if (params.get('utm_medium')) result.utmMedium = params.get('utm_medium');
+  if (params.get('utm_campaign')) result.utmCampaign = params.get('utm_campaign');
 
   return result;
 };
@@ -153,9 +182,9 @@ const getTrafficSource = (urlParams) => {
   return ref;
 };
 
-// Tezkor Geolocation olish (Timeout bilan, hech qachon bot xabarini to'xtatib qo'ymaydi)
+// Tezkor Geolocation olish (800ms limit, bot xabarini aslo kechiktirmaydi)
 const fetchGeoLocation = async () => {
-  const fetchWithTimeout = async (url, timeoutMs = 1500) => {
+  const fetchWithTimeout = async (url, timeoutMs = 800) => {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
     try {
@@ -169,7 +198,6 @@ const fetchGeoLocation = async () => {
   };
 
   try {
-    // 1-urinish: ipwho.is (Juda tez va limitsiz)
     const ipWhoisData = await fetchWithTimeout('https://ipwho.is/');
     if (ipWhoisData && ipWhoisData.success !== false) {
       return {
@@ -179,21 +207,6 @@ const fetchGeoLocation = async () => {
         country: ipWhoisData.country || 'O\'zbekiston',
         countryCode: ipWhoisData.country_code || 'UZ',
         org: ipWhoisData.connection?.isp || ipWhoisData.connection?.org || 'Internet Provayder',
-        timezone: ipWhoisData.timezone?.id || 'Asia/Tashkent',
-      };
-    }
-
-    // 2-urinish: ipapi.co
-    const ipApiData = await fetchWithTimeout('https://ipapi.co/json/');
-    if (ipApiData && ipApiData.ip) {
-      return {
-        ip: ipApiData.ip || 'Noma\'lum',
-        city: ipApiData.city || 'Noma\'lum',
-        region: ipApiData.region || 'Noma\'lum',
-        country: ipApiData.country_name || 'O\'zbekiston',
-        countryCode: ipApiData.country_code || 'UZ',
-        org: ipApiData.org || 'Internet Provayder',
-        timezone: ipApiData.timezone || 'Asia/Tashkent',
       };
     }
   } catch {
@@ -203,7 +216,7 @@ const fetchGeoLocation = async () => {
   return { ip: 'Yashirin / Mobil Tarmoq', city: 'Aniqlanmadi', country: 'O\'zbekiston/Global', countryCode: 'UZ' };
 };
 
-// Telegram Botga xabar yuborish
+// Telegram Botga xabar yuborish (Avtomatik plain-text fallback bilan)
 export const sendTelegramNotification = async (messageText, customConfig = {}) => {
   const creds = getTrackerCredentials();
   const token = customConfig.BOT_TOKEN || creds.BOT_TOKEN;
@@ -227,6 +240,33 @@ export const sendTelegramNotification = async (messageText, customConfig = {}) =
     });
 
     const result = await response.json();
+
+    // Agar Telegram API HTML parsingda xatolik bersa (masalan unescaped entity), darhol oddiy matn bilan qayta yuborish
+    if (!result.ok) {
+      console.warn('HTML xabari rad etildi, plain-text ko\'rinishida qayta yuborilmoqda...', result);
+      const plainText = messageText
+        .replace(/<b>(.*?)<\/b>/gi, '$1')
+        .replace(/<code>(.*?)<\/code>/gi, '$1')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"');
+
+      const fallbackResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: plainText,
+          disable_web_page_preview: true,
+        }),
+      });
+
+      const fallbackResult = await fallbackResponse.json();
+      return { success: fallbackResult.ok, result: fallbackResult };
+    }
+
     return { success: result.ok, result };
   } catch (error) {
     console.error('Telegram botga xabar yuborishda xatolik:', error);
@@ -238,12 +278,16 @@ export const sendTelegramNotification = async (messageText, customConfig = {}) =
 export const trackVisitor = async (config = {}) => {
   try {
     const urlParams = getUrlParameters();
-    const hasSpecialLink = Boolean(urlParams.targetUser || urlParams.referrerSource || urlParams.utmSource);
+    const isTelegramVisitor = /Telegram/i.test(navigator.userAgent) || 
+                              document.referrer.includes('t.me') || 
+                              document.referrer.includes('telegram') ||
+                              urlParams.referrerSource === 'telegram';
+    const hasSpecialLink = Boolean(urlParams.targetUser || urlParams.referrerSource || urlParams.utmSource || isTelegramVisitor);
 
-    // Spamdan himoya: faqat oddiy qayta yuklashlar uchun 2 daqiqa. Maxsus link bo'lsa darhol yuboradi!
+    // Spamdan himoya: faqat oddiy sahifa yangilashlar uchun
     const lastTrackTime = sessionStorage.getItem('zxam_last_track_time');
     const now = Date.now();
-    const debounceMs = 2 * 60 * 1000; // 2 daqiqa
+    const debounceMs = 2 * 60 * 1000;
 
     if (!hasSpecialLink && lastTrackTime && now - parseInt(lastTrackTime, 10) < debounceMs) {
       return;
@@ -265,7 +309,7 @@ export const trackVisitor = async (config = {}) => {
       second: '2-digit',
     });
 
-    // Aniq, chiroyli va to'liq Telegram xabari formatlash
+    // 100% xavfsiz va to'liq HTML-escaped xabar
     let message = `🎯 <b>YANGI TASHRIF HISOBOTI</b> 🎯\n\n`;
 
     // 1. Profil Egasi
@@ -275,24 +319,24 @@ export const trackVisitor = async (config = {}) => {
     // 2. Tashrif Buyuruvchi Shaxsi / Profili
     if (tgUser) {
       message += `⭐️ <b>Tashrif Buyuruvchi Telegram Profili:</b>\n`;
-      message += `├ 👤 <b>Ism:</b> ${tgUser.firstName} ${tgUser.lastName}\n`;
-      message += `├ 🔗 <b>Username:</b> ${tgUser.username}\n`;
-      message += `├ 🆔 <b>Telegram ID:</b> <code>${tgUser.id}</code>\n`;
-      message += `├ 🌟 <b>Hisob turi:</b> ${tgUser.isPremium}\n`;
-      message += `└ 🌐 <b>Tili:</b> ${tgUser.languageCode}\n\n`;
+      message += `├ 👤 <b>Ism:</b> ${escapeHtml(tgUser.firstName)} ${escapeHtml(tgUser.lastName)}\n`;
+      message += `├ 🔗 <b>Username:</b> ${escapeHtml(tgUser.username)}\n`;
+      message += `├ 🆔 <b>Telegram ID:</b> <code>${escapeHtml(tgUser.id)}</code>\n`;
+      message += `├ 🌟 <b>Hisob turi:</b> ${escapeHtml(tgUser.isPremium)}\n`;
+      message += `└ 🌐 <b>Tili:</b> ${escapeHtml(tgUser.languageCode)}\n\n`;
     }
 
     // 3. Maxsus Shaxsiy Link / Profil parametrlar
     if (urlParams.targetUser || urlParams.referrerSource || urlParams.utmSource) {
       message += `🎯 <b>Yo'naltirilgan Shaxs / Maxsus Link:</b>\n`;
       if (urlParams.targetUser) {
-        message += `├ 👤 <b>Kimga yuborilgan:</b> ⭐️ <b>${urlParams.targetUser}</b>\n`;
+        message += `├ 👤 <b>Kimga yuborilgan:</b> ⭐️ <b>${escapeHtml(urlParams.targetUser)}</b>\n`;
       }
       if (urlParams.referrerSource) {
-        message += `├ 🔗 <b>Havola manbasi:</b> <code>${urlParams.referrerSource}</code>\n`;
+        message += `├ 🔗 <b>Havola manbasi:</b> <code>${escapeHtml(urlParams.referrerSource)}</code>\n`;
       }
       if (urlParams.utmSource) {
-        message += `└ 📊 <b>UTM Source:</b> <code>${urlParams.utmSource}</code>\n`;
+        message += `└ 📊 <b>UTM Source:</b> <code>${escapeHtml(urlParams.utmSource)}</code>\n`;
       }
       message += `\n`;
     } else if (!tgUser) {
@@ -300,33 +344,32 @@ export const trackVisitor = async (config = {}) => {
     }
 
     // 4. Kirish Manbasi
-    message += `🔗 <b>Kirish Manbasi:</b> ${trafficSource}\n\n`;
+    message += `🔗 <b>Kirish Manbasi:</b> ${escapeHtml(trafficSource)}\n\n`;
 
     // 5. Joylashuv & Tarmoq
     message += `📍 <b>Joylashuv & Tarmoq:</b>\n`;
-    message += `├ 🏙 <b>Shahar / Davlat:</b> ${geo.city || 'Noma\'lum'}, ${geo.country || 'O\'zbekiston'} ${geo.countryCode ? `(${geo.countryCode})` : ''}\n`;
-    message += `├ 🌐 <b>IP Manzil:</b> <code>${geo.ip}</code>\n`;
-    message += `└ 📡 <b>Provayder (ISP):</b> ${geo.org || 'Aniqlanmadi'}\n\n`;
+    message += `├ 🏙 <b>Shahar / Davlat:</b> ${escapeHtml(geo.city || 'Noma\'lum')}, ${escapeHtml(geo.country || 'O\'zbekiston')} (${escapeHtml(geo.countryCode || 'UZ')})\n`;
+    message += `├ 🌐 <b>IP Manzil:</b> <code>${escapeHtml(geo.ip)}</code>\n`;
+    message += `└ 📡 <b>Provayder (ISP):</b> ${escapeHtml(geo.org || 'Aniqlanmadi')}\n\n`;
 
     // 6. Qurilma va Brauzer
     message += `📱 <b>Qurilma & Tizim:</b>\n`;
-    message += `├ 📱 <b>Qurilma:</b> ${device.device}\n`;
-    message += `├ 💻 <b>Tizim (OS):</b> ${device.os}\n`;
-    message += `├ 🌐 <b>Brauzer:</b> ${device.browser}\n`;
-    message += `├ 🖥 <b>Ekran:</b> ${device.screen} (Viewport: ${device.viewport})\n`;
-    message += `└ 🗣 <b>Tizim Tili:</b> ${device.language}\n\n`;
+    message += `├ 📱 <b>Qurilma:</b> ${escapeHtml(device.device)}\n`;
+    message += `├ 💻 <b>Tizim (OS):</b> ${escapeHtml(device.os)}\n`;
+    message += `├ 🌐 <b>Brauzer:</b> ${escapeHtml(device.browser)}\n`;
+    message += `├ 🖥 <b>Ekran:</b> ${escapeHtml(device.screen)} (Viewport: ${escapeHtml(device.viewport)})\n`;
+    message += `└ 🗣 <b>Tizim Tili:</b> ${escapeHtml(device.language)}\n\n`;
 
     // 7. Vaqt va To'liq Havola
-    message += `🕒 <b>Vaqt:</b> ${timeString} (Toshkent vaqti)\n`;
-    message += `🌐 <b>Ochilgan havola:</b> <code>${window.location.href}</code>`;
+    message += `🕒 <b>Vaqt:</b> ${escapeHtml(timeString)} (Toshkent vaqti)\n`;
+    message += `🌐 <b>Ochilgan havola:</b> <code>${escapeHtml(window.location.href)}</code>`;
 
     // Telegramga yuborish
     const sendResult = await sendTelegramNotification(message, config);
 
     // Mahalliy xotirada oxirgi yuborilgan vaqtni saqlab qo'yish
-    if (sendResult.success) {
+    if (sendResult?.success) {
       sessionStorage.setItem('zxam_last_track_time', now.toString());
-      // Admin dashboard uchun oxirgi tashriflar tarixiga saqlash
       saveToLocalVisitorHistory({
         time: timeString,
         tgUser,
@@ -349,9 +392,9 @@ export const trackUserAction = async (actionName, details = {}) => {
     const urlParams = getUrlParameters();
     const who = urlParams.targetUser ? ` (${urlParams.targetUser})` : '';
 
-    const message = `⚡ <b>Foydalanuvchi Harakati:</b> ${actionName}${who}\n` +
-      `├ <b>Batafsil:</b> ${JSON.stringify(details)}\n` +
-      `└ <b>Vaqt:</b> ${timeString}`;
+    const message = `⚡ <b>Foydalanuvchi Harakati:</b> ${escapeHtml(actionName)}${escapeHtml(who)}\n` +
+      `├ <b>Batafsil:</b> ${escapeHtml(JSON.stringify(details))}\n` +
+      `└ <b>Vaqt:</b> ${escapeHtml(timeString)}`;
 
     await sendTelegramNotification(message);
   } catch {
