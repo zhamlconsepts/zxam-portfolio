@@ -99,18 +99,6 @@ const Navbar = ({ lang, setLang, t, onOpenCV }) => {
             </a>
           </div>
 
-          {/* Center: "CONTACT US" (Desktop Link) */}
-          <div className="pointer-events-auto hidden md:block">
-            <a
-              href="#contact"
-              onClick={playClickSound}
-              className="group relative inline-block text-xs uppercase tracking-widest text-[#ffffff] hover:text-[#e60000] transition-colors py-1"
-            >
-              <ScrambleText text={t.btnContactUs || 'CONTACT US'} variant="matrix" />
-              <span className="absolute bottom-0 left-0 w-0 h-[1.5px] bg-[#e60000] group-hover:w-full transition-all duration-300" />
-            </a>
-          </div>
-
           {/* Desktop Navigation Menu (md:flex) */}
           <div className="pointer-events-auto hidden md:flex flex-col items-end text-right space-y-1.5 sm:space-y-2">
             {navItems.slice(0, 4).map((item) => (
