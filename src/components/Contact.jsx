@@ -34,18 +34,18 @@ const Contact = ({ onShowToast, t }) => {
   };
 
   return (
-    <section id="contact" className="py-24 lg:py-36 relative border-t border-white/10 bg-[#08080a]">
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-14">
+    <section id="contact" className="py-16 sm:py-24 lg:py-36 relative border-t border-white/10 bg-[#08080a]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-10 lg:px-14">
         
         {/* Editorial Section Header */}
-        <div className="flex flex-wrap items-end justify-between gap-6 pb-8 border-b border-white/10 mb-20">
+        <div className="flex flex-wrap items-end justify-between gap-4 sm:gap-6 pb-6 sm:pb-8 border-b border-white/10 mb-12 sm:mb-20">
           <div className="stagger-text">
             <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-[#e60000] mb-3 font-bold">
               <span>( 05 )</span>
               <span className="w-8 h-[1px] bg-[#e60000]" />
               <span>DIRECT CHANNELS &bull; INQUIRIES</span>
             </div>
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black font-editorial uppercase tracking-tighter leading-none text-white">
+            <h2 className="text-3xl sm:text-6xl lg:text-7xl font-black font-editorial uppercase tracking-tighter leading-none text-white">
               CONTACT{' '}
               <span className="text-[#e60000]">
                 US
@@ -53,7 +53,7 @@ const Contact = ({ onShowToast, t }) => {
             </h2>
           </div>
 
-          <div className="stagger-text font-mono text-xs text-zinc-400 uppercase tracking-wider text-right">
+          <div className="stagger-text font-mono text-xs text-zinc-400 uppercase tracking-wider text-left sm:text-right">
             <div>// OPEN FOR WORK &bull; CONTRACTS</div>
             <div className="text-white font-bold">GULISTON // WORLDWIDE</div>
           </div>

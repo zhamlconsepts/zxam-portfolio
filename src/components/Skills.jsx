@@ -155,18 +155,18 @@ const Skills = ({ lang }) => {
   });
 
   return (
-    <section id="skills" className="py-24 lg:py-36 relative border-t border-white/10 bg-[#08080a]">
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-14">
+    <section id="skills" className="py-16 sm:py-24 lg:py-36 relative border-t border-white/10 bg-[#08080a]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-10 lg:px-14">
         
         {/* Section Header */}
-        <div className="flex flex-wrap items-end justify-between gap-6 pb-8 border-b border-white/10 mb-16">
+        <div className="flex flex-wrap items-end justify-between gap-4 sm:gap-6 pb-6 sm:pb-8 border-b border-white/10 mb-12 sm:mb-16">
           <div className="stagger-text">
             <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-[#e60000] mb-3 font-bold">
               <span>( 02 )</span>
               <span className="w-8 h-[1px] bg-[#e60000]" />
               <ScrambleText text={lang === 'uz' ? 'TEXNOLOGIK STACK' : lang === 'ru' ? 'ТЕХНОЛОГИЧЕСКИЙ СТЕК' : 'TECHNOLOGY STACK'} variant="tech" />
             </div>
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black font-editorial text-white uppercase tracking-tighter leading-none">
+            <h2 className="text-3xl sm:text-6xl lg:text-7xl font-black font-editorial text-white uppercase tracking-tighter leading-none">
               <ScrambleText text={lang === 'uz' ? "KO'NIKMALAR VA" : lang === 'ru' ? "НАВЫКИ И" : "SKILLS &"} variant="matrix" />
               <span className="text-[#e60000] inline-block ml-3">
                 <ScrambleText text={lang === 'uz' ? "VOSITALAR" : lang === 'ru' ? "ТЕХНОЛОГИИ" : "TOOLS"} variant="cyber" />

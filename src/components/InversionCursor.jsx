@@ -22,13 +22,27 @@ const InversionCursor = () => {
   const [cursorState, setCursorState] = useState('default'); // 'default', 'hover', 'view'
   const [isClicked, setIsClicked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isTouch, setIsTouch] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth < 768;
+    }
+    return false;
+  });
 
   useEffect(() => {
     // Only enable on desktop pointer devices
-    if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) {
+    const checkTouch = () => {
+      return window.matchMedia('(hover: none) and (pointer: coarse)').matches || window.innerWidth < 768;
+    };
+
+    if (checkTouch()) {
+      setIsTouch(true);
+      document.documentElement.style.cursor = '';
+      document.body.style.cursor = '';
       return;
     }
 
+    setIsTouch(false);
     // Enforce cursor suppression on document root
     document.documentElement.style.cursor = 'none';
     document.body.style.cursor = 'none';
@@ -161,6 +175,10 @@ const InversionCursor = () => {
   }, []);
 
   const isHovering = cursorState === 'hover' || cursorState === 'view';
+
+  if (isTouch) {
+    return null;
+  }
 
   return createPortal(
     <div

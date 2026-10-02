@@ -140,23 +140,23 @@ const ScrollManifesto = ({ lang }) => {
     <section
       ref={sectionRef}
       id="manifesto"
-      className="dark-focus-section relative py-32 lg:py-48 bg-[#000000] text-white transition-colors duration-700 overflow-hidden border-y border-white/10 select-none"
+      className="dark-focus-section relative py-20 sm:py-32 lg:py-48 bg-[#000000] text-white transition-colors duration-700 overflow-hidden border-y border-white/10 select-none"
     >
       {/* Focused ambient central spotlight */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[750px] bg-[#e60000]/6 rounded-full blur-[180px] pointer-events-none" />
 
-      <div className="max-w-6xl mx-auto px-6 sm:px-10 lg:px-14 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-10 lg:px-14 relative z-10">
         
         {/* Top Tag */}
-        <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-[#e60000] mb-12 font-bold">
+        <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-[#e60000] mb-8 sm:mb-12 font-bold">
           <span className="w-2 h-2 rounded-full bg-[#e60000] animate-ping" />
           <span>// FRONTEND PHILOSOPHY &bull; CORE SEQUENCE</span>
-          <span className="w-12 h-[1px] bg-white/20" />
+          <span className="w-12 h-[1px] bg-white/20 hidden sm:inline-block" />
         </div>
 
         {/* Word-by-word Scrub Illuminated Manifesto Text */}
-        <div ref={textRef} className="mb-24 sm:mb-32">
-          <p className="font-editorial text-3xl sm:text-5xl lg:text-6xl font-extrabold uppercase tracking-tight leading-[1.18] sm:leading-[1.15]">
+        <div ref={textRef} className="mb-16 sm:mb-24 lg:mb-32">
+          <p className="font-editorial text-2xl sm:text-5xl lg:text-6xl font-extrabold uppercase tracking-tight leading-[1.2] sm:leading-[1.15]">
             {wordsArray.map((word, idx) => {
               const cleanWord = word.replace(/[^A-Z0-9-]/gi, '');
               const isAccent = accentWords.includes(cleanWord);

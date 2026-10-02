@@ -97,13 +97,13 @@ export const ProjectModal = ({ project, onClose, lang, t }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-wrap items-center gap-4 pt-6 border-t border-[#ffffff]/15 uppercase tracking-wider">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-6 border-t border-[#ffffff]/15 uppercase tracking-wider">
           <a
             href={project.liveUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={playClickSound}
-            className="flex items-center gap-2 px-6 py-3.5 bg-[#ffffff] hover:bg-[#e60000] text-[#0b0b0b] hover:text-[#ffffff] font-bold text-xs transition-colors"
+            className="flex items-center justify-center gap-2 px-6 py-3.5 bg-[#ffffff] hover:bg-[#e60000] text-[#0b0b0b] hover:text-[#ffffff] font-bold text-xs transition-colors text-center"
           >
             <span>LIVE DEMO</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -113,7 +113,7 @@ export const ProjectModal = ({ project, onClose, lang, t }) => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={playClickSound}
-            className="flex items-center gap-2 px-6 py-3.5 border border-[#ffffff]/30 hover:border-[#ffffff] text-[#ffffff] text-xs font-semibold transition-colors"
+            className="flex items-center justify-center gap-2 px-6 py-3.5 border border-[#ffffff]/30 hover:border-[#ffffff] text-[#ffffff] text-xs font-semibold transition-colors text-center"
           >
             <GithubIcon className="w-4 h-4" />
             <span>GITHUB CODE</span>
@@ -134,7 +134,7 @@ export const CVModal = ({ isOpen, onClose, t }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
       role="dialog"
       aria-modal="true"
     >
@@ -146,17 +146,17 @@ export const CVModal = ({ isOpen, onClose, t }) => {
         }}
       />
 
-      <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto bg-[#0b0b0b] border border-[#ffffff]/20 shadow-[0_25px_60px_rgba(0,0,0,0.95)] z-20 p-6 sm:p-10 animate-modal-zoom custom-scrollbar print-modal-area font-mono text-xs">
+      <div className="relative w-full max-w-3xl max-h-[92vh] overflow-y-auto bg-[#0b0b0b] border border-[#ffffff]/20 shadow-[0_25px_60px_rgba(0,0,0,0.95)] z-20 p-5 sm:p-10 animate-modal-zoom custom-scrollbar print-modal-area font-mono text-xs">
         {/* Close Button */}
         <button
           onClick={() => {
             playClickSound();
             onClose();
           }}
-          className="absolute top-6 right-6 w-10 h-10 flex items-center justify-center bg-[#000000] hover:bg-[#e60000] text-[#ffffff] border border-[#ffffff]/20 transition-colors print:hidden cursor-pointer z-30"
+          className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center bg-[#000000] hover:bg-[#e60000] text-[#ffffff] border border-[#ffffff]/20 transition-colors print:hidden cursor-pointer z-30"
           aria-label="Yopish"
         >
-          <X className="w-5 h-5 pointer-events-none" />
+          <X className="w-4 h-4 sm:w-5 sm:h-5 pointer-events-none" />
         </button>
 
         {/* Header */}

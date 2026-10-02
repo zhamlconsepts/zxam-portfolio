@@ -72,29 +72,29 @@ const Hero = ({ onOpenCV, t }) => {
   return (
     <section
       id="hero"
-      className="relative min-h-screen pt-32 pb-20 lg:pt-36 lg:pb-24 flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen pt-24 sm:pt-32 pb-16 lg:pt-36 lg:pb-24 flex items-center justify-center overflow-hidden"
     >
       {/* Subtle ambient lighting glows */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-[#e60000]/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-10 right-1/4 w-[600px] h-[600px] bg-white/[0.02] rounded-full blur-[160px] pointer-events-none" />
+      <div className="absolute top-1/4 left-1/4 w-[280px] sm:w-[500px] h-[280px] sm:h-[500px] bg-[#e60000]/10 rounded-full blur-[100px] sm:blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 right-1/4 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-white/[0.02] rounded-full blur-[120px] sm:blur-[160px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-14 w-full relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-10 lg:px-14 w-full relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* Left Column: Typography, Real Typewriter Effect, Actions (6 cols max-w-xl) */}
           <div className="lg:col-span-6 xl:col-span-6 flex flex-col items-start text-left z-20 max-w-xl">
             
             {/* Live Status - Editorial Text */}
-            <div className="hero-badge-entry flex items-center gap-3 font-mono text-xs mb-6 tracking-widest uppercase">
+            <div className="hero-badge-entry flex flex-wrap items-center gap-2 sm:gap-3 font-mono text-[11px] sm:text-xs mb-4 sm:mb-6 tracking-widest uppercase">
               <span className="w-2 h-2 rounded-full bg-[#e60000] animate-ping" />
               <span className="text-white font-bold">// {t.badgeStatus ? t.badgeStatus.toUpperCase() : 'ISH VA LOYIHALAR UCHUN OCHIQ'}</span>
-              <span className="text-zinc-600">&bull;</span>
+              <span className="text-zinc-600 hidden sm:inline">&bull;</span>
               <span className="text-[#e60000] font-semibold">{t.badgeLocation || 'GULISTON ( UZ )'}</span>
             </div>
 
             {/* Giant Razor-Sharp Headline with Interactive Hover Scrambler */}
-            <div className="mb-2 select-none overflow-hidden">
-              <h1 className="text-5xl sm:text-7xl md:text-8xl xl:text-9xl font-black font-editorial tracking-tighter uppercase leading-[0.88] text-white">
+            <div className="mb-2 select-none overflow-hidden w-full">
+              <h1 className="text-[38px] xs:text-[44px] sm:text-7xl md:text-8xl xl:text-9xl font-black font-editorial tracking-tighter uppercase leading-[0.9] text-white">
                 <span
                   onMouseEnter={() => scramble('ABLAKIMOV', setHeadlineText1)}
                   className="hero-title-entry block hover:text-[#e60000] transition-colors duration-300 cursor-crosshair"
@@ -110,27 +110,27 @@ const Hero = ({ onOpenCV, t }) => {
               </h1>
             </div>
 
-            {/* Prominent Live Typewriter Terminal Line - FIXED HEIGHT to eliminate layout shifts */}
-            <div className="hero-typewriter-entry my-6 w-full">
-              <div className="h-12 sm:h-14 lg:h-16 flex items-center">
-                <div className="font-mono text-lg sm:text-2xl lg:text-3xl text-white font-bold tracking-tight flex items-center gap-2 whitespace-nowrap overflow-hidden">
+            {/* Prominent Live Typewriter Terminal Line */}
+            <div className="hero-typewriter-entry my-4 sm:my-6 w-full">
+              <div className="min-h-[40px] sm:h-14 lg:h-16 flex items-center">
+                <div className="font-mono text-base sm:text-2xl lg:text-3xl text-white font-bold tracking-tight flex items-center gap-2 whitespace-nowrap overflow-hidden">
                   <span className="text-[#e60000] shrink-0">&gt;</span>
                   <span className="text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] truncate">{displayText}</span>
-                  <span className="inline-block w-2.5 h-6 sm:h-7 bg-[#e60000] animate-blink shrink-0" />
+                  <span className="inline-block w-2 sm:w-2.5 h-5 sm:h-7 bg-[#e60000] animate-blink shrink-0" />
                 </div>
               </div>
-              <div className="font-mono text-xs text-zinc-500 uppercase tracking-widest mt-1 select-none">
+              <div className="font-mono text-[10px] sm:text-xs text-zinc-500 uppercase tracking-widest mt-1 select-none">
                 // SPECIALIZING IN REACT.JS, TAILWIND CSS & HIGH-PERFORMANCE WEB APPS
               </div>
             </div>
 
             {/* Bio Paragraph */}
-            <p className="hero-bio-entry text-base sm:text-lg leading-relaxed text-zinc-300 max-w-xl mb-8 font-sans">
+            <p className="hero-bio-entry text-sm sm:text-base lg:text-lg leading-relaxed text-zinc-300 max-w-xl mb-6 sm:mb-8 font-sans">
               {t.heroBio || "React.js, Tailwind CSS va zamonaviy JavaScript yordamida tezkor, toza arxitekturali va interaktiv veb-ilovalarni yarataman. Foydalanuvchi tajribasi (UX) va vizual mukammallik men uchun ustuvor."}
             </p>
 
             {/* Clean Typographic Tech Specs */}
-            <div className="hero-tech-entry flex flex-wrap items-center gap-x-4 gap-y-2 mb-10 font-mono text-xs text-zinc-400">
+            <div className="hero-tech-entry flex flex-wrap items-center gap-x-3 gap-y-1.5 sm:gap-x-4 sm:gap-y-2 mb-8 sm:mb-10 font-mono text-[11px] sm:text-xs text-zinc-400">
               <ScrambleText text="REACT.JS" variant="tech" className="text-white font-semibold" />
               <span className="text-zinc-600">/</span>
               <ScrambleText text="TAILWIND CSS" variant="tech" className="text-white font-semibold" />
@@ -144,12 +144,12 @@ const Hero = ({ onOpenCV, t }) => {
               <ScrambleText text="VERCEL" variant="tech" className="text-white font-semibold" />
             </div>
 
-            {/* Action Buttons */}
-            <div className="hero-actions-entry flex flex-wrap items-center gap-4 mb-10">
+            {/* Action Buttons (Full Width on Mobile for Thumb Comfort) */}
+            <div className="hero-actions-entry flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-8 sm:mb-10 w-full sm:w-auto">
               <a
                 href="#projects"
                 onClick={playClickSound}
-                className="group inline-flex items-center gap-2.5 px-8 py-4 bg-white text-black hover:bg-[#e60000] hover:text-white font-mono text-xs uppercase tracking-widest font-bold transition-all duration-300 shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:-translate-y-0.5 cursor-pointer"
+                className="group inline-flex items-center justify-center gap-2.5 px-6 sm:px-8 py-3.5 sm:py-4 bg-white text-black hover:bg-[#e60000] hover:text-white font-mono text-xs uppercase tracking-widest font-bold transition-all duration-300 shadow-[0_10px_30px_rgba(255,255,255,0.1)] hover:-translate-y-0.5 cursor-pointer text-center"
               >
                 <span>{t.btnExploreProjects || "LOYIHALARNI KO'RISH"}</span>
                 <ArrowDown className="w-4 h-4 transition-transform group-hover:translate-y-1" />
@@ -158,7 +158,7 @@ const Hero = ({ onOpenCV, t }) => {
               <a
                 href="#contact"
                 onClick={playClickSound}
-                className="inline-flex items-center gap-2.5 px-7 py-4 border border-white/20 hover:border-white text-white hover:bg-white/10 font-mono text-xs uppercase tracking-widest transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
+                className="inline-flex items-center justify-center gap-2.5 px-6 sm:px-7 py-3.5 sm:py-4 border border-white/20 hover:border-white text-white hover:bg-white/10 font-mono text-xs uppercase tracking-widest transition-all duration-300 hover:-translate-y-0.5 cursor-pointer text-center"
               >
                 <span>{t.btnGetInTouch || "BOG'LANISH"}</span>
                 <ArrowUpRight className="w-4 h-4" />
@@ -170,7 +170,7 @@ const Hero = ({ onOpenCV, t }) => {
                     playClickSound();
                     onOpenCV();
                   }}
-                  className="inline-flex items-center gap-2 px-6 py-4 border border-[#e60000]/40 hover:border-[#e60000] text-white hover:bg-[#e60000]/10 font-mono text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-3.5 sm:py-4 border border-[#e60000]/40 hover:border-[#e60000] text-white hover:bg-[#e60000]/10 font-mono text-xs uppercase tracking-widest transition-all duration-300 cursor-pointer text-center"
                 >
                   <FileText className="w-4 h-4 text-[#e60000]" />
                   <span>{t.btnResume || "CV KO'RISH"}</span>
@@ -178,8 +178,8 @@ const Hero = ({ onOpenCV, t }) => {
               )}
             </div>
 
-            {/* Quick Links: Telegram & GitHub only (abdusalomovv.uz removed) */}
-            <div className="hero-links-entry flex flex-wrap items-center gap-6 pt-6 border-t border-white/10 font-mono text-xs text-zinc-400">
+            {/* Quick Links */}
+            <div className="hero-links-entry flex flex-wrap items-center gap-4 sm:gap-6 pt-4 sm:pt-6 border-t border-white/10 font-mono text-[11px] sm:text-xs text-zinc-400">
               <span className="text-zinc-500 uppercase">// ALOQA:</span>
               <a
                 href="https://t.me/jamwidunvrsl"
@@ -218,10 +218,10 @@ const Hero = ({ onOpenCV, t }) => {
                 className="absolute top-[28%] sm:top-[30%] lg:top-[32%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full z-0 pointer-events-none select-none flex flex-col items-center justify-center text-center px-2"
                 aria-hidden="true"
               >
-                <span className="font-editorial font-black text-[#e60000] text-[80px] sm:text-[110px] md:text-[135px] lg:text-[150px] xl:text-[170px] leading-none tracking-tight uppercase select-none drop-shadow-[0_0_40px_rgba(230,0,0,0.9)] drop-shadow-[0_0_15px_rgba(230,0,0,0.85)] scale-y-105 whitespace-nowrap">
+                <span className="font-editorial font-black text-[#e60000] text-[60px] xs:text-[75px] sm:text-[110px] md:text-[135px] lg:text-[150px] xl:text-[170px] leading-none tracking-tight uppercase select-none drop-shadow-[0_0_40px_rgba(230,0,0,0.9)] drop-shadow-[0_0_15px_rgba(230,0,0,0.85)] scale-y-105 whitespace-nowrap">
                   ZXAM
                 </span>
-                <span className="font-mono text-[9px] sm:text-[11px] text-[#e60000] tracking-[0.35em] uppercase mt-1 sm:mt-1.5 font-bold drop-shadow-[0_0_10px_rgba(230,0,0,0.9)]">
+                <span className="font-mono text-[8px] sm:text-[11px] text-[#e60000] tracking-[0.3em] sm:tracking-[0.35em] uppercase mt-1 sm:mt-1.5 font-bold drop-shadow-[0_0_10px_rgba(230,0,0,0.9)]">
                   // IDENTITY: ZXAM
                 </span>
               </div>

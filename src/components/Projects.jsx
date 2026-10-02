@@ -135,18 +135,18 @@ const Projects = ({ onSelectProject, lang, t }) => {
   ];
 
   return (
-    <section id="projects" className="py-24 lg:py-36 relative border-t border-white/10 bg-[#08080a]">
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-14">
+    <section id="projects" className="py-16 sm:py-24 lg:py-36 relative border-t border-white/10 bg-[#08080a]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-10 lg:px-14">
         
         {/* Section Header */}
-        <div className="flex flex-wrap items-end justify-between gap-6 pb-8 border-b border-white/10 mb-24">
+        <div className="flex flex-wrap items-end justify-between gap-4 sm:gap-6 pb-6 sm:pb-8 border-b border-white/10 mb-12 sm:mb-20">
           <div className="stagger-text">
             <div className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-[#e60000] mb-3 font-bold">
               <span>( 03 )</span>
               <span className="w-8 h-[1px] bg-[#e60000]" />
               <ScrambleText text="RECORDS // SELECTED WORKS" variant="tech" />
             </div>
-            <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black font-editorial uppercase tracking-tighter leading-none text-white">
+            <h2 className="text-3xl sm:text-6xl lg:text-7xl font-black font-editorial uppercase tracking-tighter leading-none text-white">
               <ScrambleText text="PROJECTS" variant="matrix" />
               <span className="text-[#e60000] inline-block ml-3">
                 <ScrambleText text="&bull; RELEASES" variant="cyber" />
@@ -154,7 +154,7 @@ const Projects = ({ onSelectProject, lang, t }) => {
             </h2>
           </div>
 
-          <div className="stagger-text font-mono text-xs text-zinc-400 uppercase tracking-wider text-right">
+          <div className="stagger-text font-mono text-xs text-zinc-400 uppercase tracking-wider text-left sm:text-right">
             <div>// CODE REPOSITORIES &bull; LIVE SITES</div>
             <div className="text-white font-bold">
               <ScrambleText text="REACT &bull; TAILWIND &bull; VERCEL" variant="tech" />
@@ -163,7 +163,7 @@ const Projects = ({ onSelectProject, lang, t }) => {
         </div>
 
         {/* Asymmetrical Editorial Project Spreads (NO CARDS, PURE FLUID LAYOUT) */}
-        <div className="space-y-28 lg:space-y-36">
+        <div className="space-y-16 sm:space-y-28 lg:space-y-36">
           {projectsData.map((project, i) => {
             const isReversed = i % 2 === 1;
 
@@ -236,39 +236,41 @@ const Projects = ({ onSelectProject, lang, t }) => {
                   </div>
 
                   {/* Actions - Clean Editorial Buttons */}
-                  <div className="flex flex-wrap items-center gap-4 pt-6 border-t border-white/10 font-mono text-xs uppercase tracking-wider">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 pt-6 border-t border-white/10 font-mono text-xs uppercase tracking-wider">
                     <button
                       onClick={() => {
                         playClickSound();
                         onSelectProject(project);
                       }}
-                      className="px-6 py-3.5 bg-white text-black hover:bg-[#e60000] hover:text-white font-bold transition-colors flex items-center gap-2 cursor-pointer"
+                      className="px-6 py-3.5 bg-white text-black hover:bg-[#e60000] hover:text-white font-bold transition-colors flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto text-center"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       <span>{t.btnViewDetails || 'VIEW DETAILS'}</span>
                     </button>
 
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={playClickSound}
-                      className="px-5 py-3.5 border border-white/20 hover:border-white text-white hover:bg-white/10 transition-colors flex items-center gap-1.5"
-                    >
-                      <span>LIVE DEMO</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
-                    </a>
+                    <div className="flex items-center gap-3">
+                      <a
+                        href={project.liveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={playClickSound}
+                        className="flex-1 sm:flex-none px-5 py-3.5 border border-white/20 hover:border-white text-white hover:bg-white/10 transition-colors flex items-center justify-center gap-1.5 text-center"
+                      >
+                        <span>LIVE DEMO</span>
+                        <ArrowUpRight className="w-3.5 h-3.5" />
+                      </a>
 
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={playClickSound}
-                      className="p-3.5 border border-white/20 hover:border-white text-white hover:bg-white/10 transition-colors"
-                      title="GitHub Repository"
-                    >
-                      <GithubIcon className="w-4 h-4" />
-                    </a>
+                      <a
+                        href={project.githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={playClickSound}
+                        className="p-3.5 border border-white/20 hover:border-white text-white hover:bg-white/10 transition-colors flex items-center justify-center"
+                        title="GitHub Repository"
+                      >
+                        <GithubIcon className="w-4 h-4" />
+                      </a>
+                    </div>
                   </div>
                 </div>
 

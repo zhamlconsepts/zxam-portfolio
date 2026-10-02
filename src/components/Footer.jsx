@@ -16,8 +16,8 @@ const Footer = ({ t, onOpenAdmin }) => {
   };
 
   return (
-    <footer className="py-16 border-t border-white/15 bg-black text-[#ffffff] relative z-10 font-mono text-xs uppercase tracking-wider">
-      <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-14">
+    <footer className="py-12 sm:py-16 border-t border-white/15 bg-black text-[#ffffff] relative z-10 font-mono text-xs uppercase tracking-wider">
+      <div className="max-w-7xl mx-auto px-4 sm:px-10 lg:px-14">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center justify-between">
           
           {/* Left: Verified Social Channels (Telegram @jamwidunvrsl & GitHub zhamlconsepts) */}
