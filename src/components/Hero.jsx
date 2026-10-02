@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUpRight, FileText } from 'lucide-react';
 import { GithubIcon, TelegramIcon } from './Icons';
 import { playClickSound, playHoverSound } from '../utils/audio';
 import ScrambleText from './ScrambleText';
+import NeonLiquidPortrait from './NeonLiquidPortrait';
 
 const TYPING_PHRASES = [
   "JUNIOR FRONTEND DEVELOPER",
@@ -210,29 +211,8 @@ const Hero = ({ onOpenCV, t }) => {
             {/* Ambient backlight */}
             <div className="absolute top-12 w-80 h-80 sm:w-[420px] sm:h-[420px] rounded-full bg-[#e60000]/25 blur-[120px] pointer-events-none" />
 
-            {/* Jamshid Portrait Container */}
-            <div className="relative w-full max-w-[340px] sm:max-w-[420px] lg:max-w-[480px] xl:max-w-[520px] flex justify-center items-center overflow-visible">
-              
-              {/* Giant Red "ZXAM" Typographic Backdrop - STRICTLY CONFINED TO PORTRAIT BACKDROP */}
-              <div 
-                className="absolute top-[28%] sm:top-[30%] lg:top-[32%] left-1/2 -translate-x-1/2 -translate-y-1/2 w-full z-0 pointer-events-none select-none flex flex-col items-center justify-center text-center px-2"
-                aria-hidden="true"
-              >
-                <span className="font-editorial font-black text-[#e60000] text-[80px] sm:text-[110px] md:text-[135px] lg:text-[150px] xl:text-[170px] leading-none tracking-tight uppercase select-none drop-shadow-[0_0_40px_rgba(230,0,0,0.9)] drop-shadow-[0_0_15px_rgba(230,0,0,0.85)] scale-y-105 whitespace-nowrap">
-                  ZXAM
-                </span>
-                <span className="font-mono text-[9px] sm:text-[11px] text-[#e60000] tracking-[0.35em] uppercase mt-1 sm:mt-1.5 font-bold drop-shadow-[0_0_10px_rgba(230,0,0,0.9)]">
-                  // IDENTITY: ZXAM
-                </span>
-              </div>
-
-              <img
-                src="/assets/jamshid.png"
-                alt="Ablakimov Jamshid (zxam) - Junior Frontend Developer"
-                className="relative z-10 w-full h-auto max-h-[680px] sm:max-h-[760px] lg:max-h-[820px] scale-110 sm:scale-115 lg:scale-120 origin-bottom object-contain filter contrast-[1.05] drop-shadow-[0_25px_70px_rgba(0,0,0,0.98)] select-none pointer-events-none"
-                loading="eager"
-              />
-            </div>
+            {/* Futuristic All-White Neon Silhouette with Interactive Liquid Hover Reveal */}
+            <NeonLiquidPortrait />
 
             {/* Editorial Caption */}
             <div className="mt-6 flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-zinc-400 z-20">
