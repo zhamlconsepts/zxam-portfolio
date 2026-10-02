@@ -62,17 +62,9 @@ const NeonLiquidPortrait = () => {
 
     lastPosRef.current = { x, y, time: now };
 
-    // Primary liquid pool under cursor
-    const baseRadius = Math.min(85, Math.max(50, 45 + speed * 15));
+    // Primary smooth continuous liquid pool under cursor
+    const baseRadius = Math.min(85, Math.max(55, 50 + speed * 12));
     spawnDrop(x, y, baseRadius, true);
-
-    // Secondary tear droplets / splashing satellite beads
-    const satellites = Math.floor(Math.random() * 2) + 1;
-    for (let i = 0; i < satellites; i++) {
-      const offsetX = (Math.random() - 0.5) * (baseRadius * 0.85);
-      const offsetY = (Math.random() - 0.5) * (baseRadius * 0.85);
-      spawnDrop(x + offsetX, y + offsetY, baseRadius * (0.35 + Math.random() * 0.35), false);
-    }
   }, [spawnDrop]);
 
   // Main Canvas Rendering Loop

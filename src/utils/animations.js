@@ -64,7 +64,7 @@ export const initScrollAnimations = (lenisInstance) => {
     heroTL.fromTo(heroLinks, { opacity: 0 }, { opacity: 1, duration: 0.5 }, '-=0.3');
   }
   if (heroPortrait) {
-    heroTL.fromTo(heroPortrait, { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 1.1, ease: 'power2.out' }, '-=1.0');
+    heroTL.fromTo(heroPortrait, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=1.0');
   }
 
   // 4. Scroll-Triggered Slide-Up Reveals for Sections (About, Skills, Projects, Experience, Contact)
