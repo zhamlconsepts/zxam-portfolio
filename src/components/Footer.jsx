@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUp, Lock } from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 import { playClickSound } from '../utils/audio';
 import ScrambleText from './ScrambleText';
 import { TelegramIcon, GithubIcon } from './Icons';
@@ -53,21 +53,8 @@ const Footer = ({ t, onOpenAdmin }) => {
             </div>
           </div>
 
-          {/* Right: Back to Top & Dedicated Secret Tracker Button */}
+          {/* Right: Back to Top */}
           <div className="md:col-span-3 flex flex-wrap items-center justify-start md:justify-end gap-3">
-            <button
-              onClick={() => {
-                playClickSound();
-                onOpenAdmin?.();
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-3 border border-white/10 hover:border-[#e60000]/60 bg-white/[0.02] hover:bg-[#e60000]/10 text-zinc-500 hover:text-[#e60000] transition-colors cursor-pointer text-[11px] font-mono rounded"
-              title="Yashirin Telemetriya va Bot boshqaruvi"
-              aria-label="Secret Telemetry Access"
-            >
-              <Lock className="w-3.5 h-3.5 text-[#e60000]" />
-              <span>ACCESS</span>
-            </button>
-
             <button
               onClick={scrollToTop}
               className="group flex items-center gap-2 px-5 py-3 border border-white/20 hover:border-[#e60000] hover:bg-[#e60000] hover:text-white text-white transition-all cursor-pointer font-bold tracking-widest"

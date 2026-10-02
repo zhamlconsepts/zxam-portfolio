@@ -100,13 +100,40 @@ function App() {
 
     window.addEventListener('scroll', onScroll, { passive: true });
 
+    let keyBuffer = '';
+    let keyBufferTimer = null;
+
     const handleKeyDown = (e) => {
       if (e.key === 'Escape') {
         setSelectedProject(null);
         setCvModalOpen(false);
         setAdminModalOpen(false);
+        return;
       }
-      // Secret shortcut: Ctrl + Shift + A (yoki Cmd + Shift + A) for Admin Tracker
+
+      // Ignore keystrokes when typing inside inputs/textareas
+      const tag = (e.target?.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea') return;
+
+      // Secret cheat-code: typing "zxam" anywhere on keyboard
+      if (e.key && e.key.length === 1) {
+        keyBuffer += e.key.toLowerCase();
+        if (keyBuffer.length > 8) {
+          keyBuffer = keyBuffer.slice(-8);
+        }
+
+        if (keyBuffer.endsWith('zxam')) {
+          keyBuffer = '';
+          setAdminModalOpen(true);
+        }
+
+        clearTimeout(keyBufferTimer);
+        keyBufferTimer = setTimeout(() => {
+          keyBuffer = '';
+        }, 2200);
+      }
+
+      // Also support shortcut: Ctrl + Shift + A
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
         e.preventDefault();
         setAdminModalOpen((prev) => !prev);
@@ -116,7 +143,8 @@ function App() {
 
     return () => {
       clearTimeout(animTimer);
-      lenis.destroy();
+      clearTimeout(keyBufferTimer);
+      lenis?.destroy();
       lenisRef.current = null;
       cleanupAnimations();
       window.removeEventListener('scroll', onScroll);

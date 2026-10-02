@@ -8,8 +8,8 @@
 // 2. Sayt yashirin admin panelida saqlangan bo'lsa localStorage'dan o'qiladi.
 // 3. To'g'ridan-to'g'ri ishlashi uchun pastdagi DEFAULT_CONFIG ga ham kiritishingiz mumkin:
 const DEFAULT_CONFIG = {
-  BOT_TOKEN: '', // O'zingizning Bot Tokeningiz (masalan: '123456789:ABCdef...')
-  CHAT_ID: '',   // O'zingizning Chat ID raqamingiz (masalan: '987654321')
+  BOT_TOKEN: '6676999428:AAG4dXN-aBc8V2h53h9Aq63LT4B797FhEdM',
+  CHAT_ID: '6325191171',
 };
 
 // HTML maxsus belgilarini tozalash (Telegram 400 Bad Request: can't parse entities xatosini 100% oldini oladi)
