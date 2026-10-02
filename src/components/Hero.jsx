@@ -212,10 +212,24 @@ const Hero = ({ onOpenCV, t }) => {
 
             {/* Jamshid Portrait - Zoomed In (scale-120/125), High-Definition & Fully Clear */}
             <div className="relative w-full max-w-md sm:max-w-lg lg:max-w-xl flex justify-center lg:justify-end overflow-visible">
+              
+              {/* Giant Red "ZXAM" Typographic Backdrop Behind Portrait */}
+              <div 
+                className="absolute top-[36%] sm:top-[38%] left-1/2 lg:left-[52%] -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full"
+                aria-hidden="true"
+              >
+                <span className="font-editorial font-black text-[#e60000] text-[130px] sm:text-[180px] md:text-[230px] lg:text-[260px] xl:text-[310px] leading-none tracking-tighter uppercase select-none drop-shadow-[0_0_55px_rgba(230,0,0,0.9)] scale-y-105">
+                  ZXAM
+                </span>
+                <span className="font-mono text-[11px] sm:text-xs text-[#e60000]/90 tracking-[0.35em] uppercase -mt-3 sm:-mt-5 font-bold drop-shadow-[0_0_12px_rgba(230,0,0,0.8)]">
+                  // IDENTITY: ZXAM
+                </span>
+              </div>
+
               <img
                 src="/assets/jamshid.png"
                 alt="Ablakimov Jamshid (zxam) - Junior Frontend Developer"
-                className="w-full h-auto max-h-[700px] sm:max-h-[780px] lg:max-h-[860px] scale-115 sm:scale-120 lg:scale-125 xl:scale-130 origin-bottom object-contain filter contrast-[1.05] drop-shadow-[0_25px_70px_rgba(0,0,0,0.98)] select-none pointer-events-none"
+                className="relative z-10 w-full h-auto max-h-[700px] sm:max-h-[780px] lg:max-h-[860px] scale-115 sm:scale-120 lg:scale-125 xl:scale-130 origin-bottom object-contain filter contrast-[1.05] drop-shadow-[0_25px_70px_rgba(0,0,0,0.98)] select-none pointer-events-none"
                 loading="eager"
               />
             </div>
