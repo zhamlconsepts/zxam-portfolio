@@ -101,28 +101,6 @@ const LiquidInkBackground = () => {
       uniform float uTime;
       varying vec2 vUv;
 
-      // Pseudo-random hash for Voronoi bubbles
-      vec2 hash2(vec2 p) {
-        p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
-        return fract(sin(p) * 43758.5453);
-      }
-
-      // Cellular Worley Noise for effervescent liquid foam bubbles (matching noth.in Image 1)
-      float worley(vec2 p) {
-        vec2 n = floor(p);
-        vec2 f = fract(p);
-        float m = 1.0;
-        for (int j = -1; j <= 1; j++) {
-          for (int i = -1; i <= 1; i++) {
-            vec2 g = vec2(float(i), float(j));
-            vec2 o = hash2(n + g);
-            vec2 r = g + o - f;
-            m = min(m, dot(r, r));
-          }
-        }
-        return sqrt(m);
-      }
-
       void main() {
         float density = texture2D(uDensity, vUv).r;
         if (density < 0.02) {
@@ -130,11 +108,11 @@ const LiquidInkBackground = () => {
           return;
         }
 
-        // Viscous surface wave perturbation (scalloped liquid edge)
-        float wave = sin(vUv.x * 24.0 + vUv.y * 16.0 + uTime * 0.5) * 0.016 +
-                     cos(vUv.y * 28.0 - vUv.x * 18.0 + uTime * 0.4) * 0.014;
+        // Smooth viscous wave edge perturbation
+        float wave = sin(vUv.x * 20.0 + vUv.y * 14.0 + uTime * 0.4) * 0.012 +
+                     cos(vUv.y * 24.0 - vUv.x * 16.0 + uTime * 0.35) * 0.010;
 
-        float threshold = 0.32;
+        float threshold = 0.30;
         float edge = 0.025;
         float mask = smoothstep(threshold, threshold + edge, density + wave);
         if (mask <= 0.001) {
@@ -142,21 +120,8 @@ const LiquidInkBackground = () => {
           return;
         }
 
-        // Effervescent liquid bubbles & froth near drip borders
-        float borderProximity = smoothstep(threshold, threshold + 0.24, density);
-        float bubbleField = worley(vUv * 72.0);
-        float bubbleRims = smoothstep(0.12, 0.28, bubbleField);
-
-        // Subtle foam sparkle near boundaries
-        float foam = (1.0 - borderProximity) * (1.0 - bubbleRims) * 0.38;
-
-        // Glassy liquid meniscus highlight rim
-        float rim = smoothstep(threshold, threshold + 0.015, density) * (1.0 - smoothstep(threshold + 0.015, threshold + 0.045, density));
-
-        float finalShade = clamp(mask - foam * 0.32 + rim * 0.18, 0.0, 1.0);
-
-        // Pure opaque white for mix-blend-mode: difference
-        gl_FragColor = vec4(finalShade, finalShade, finalShade, mask);
+        // Pure, solid, seamless white liquid mask for difference inversion
+        gl_FragColor = vec4(mask, mask, mask, mask);
       }
     `;
 
@@ -268,54 +233,44 @@ const LiquidInkBackground = () => {
         initialRadius: baseRadius * 0.35
       });
 
-      // 2. Heavy Vertical Dripping Tendrils (hanging downward, noth.in style)
-      const numDrips = 3 + Math.floor(Math.random() * 2);
+      // 2. Continuous Vertical Dripping Tendrils (firmly unified with central mass)
+      const numDrips = 2 + Math.floor(Math.random() * 2);
       for (let i = 0; i < numDrips; i++) {
-        const xOffset = (i - (numDrips - 1) / 2) * (baseRadius * 0.46);
-        const dripLength = baseRadius * (0.72 + Math.random() * 0.72);
-        const tipRadius = baseRadius * (0.28 + Math.random() * 0.14);
+        const xOffset = (i - (numDrips - 1) / 2) * (baseRadius * 0.38);
+        const dripLength = baseRadius * (0.50 + Math.random() * 0.40);
+        const tipRadius = baseRadius * (0.35 + Math.random() * 0.12);
 
-        // Intermediate neck to bridge smoothly into central mass
+        // Continuous neck bridge (generous radius so it never pinches off into isolated circles)
         clusterItems.push({
-          x: cx + xOffset * 0.75,
-          y: cy + dripLength * 0.45,
-          targetRadius: baseRadius * 0.32,
-          initialRadius: baseRadius * 0.15
+          x: cx + xOffset * 0.7,
+          y: cy + dripLength * 0.5,
+          targetRadius: baseRadius * 0.45,
+          initialRadius: baseRadius * 0.2
         });
 
         // Bulbous teardrop head at bottom of drip
         clusterItems.push({
-          x: cx + xOffset + (Math.random() - 0.5) * 9,
+          x: cx + xOffset,
           y: cy + dripLength,
           targetRadius: tipRadius,
           initialRadius: tipRadius * 0.25
         });
-
-        // Detached satellite tear bead below the drip
-        if (Math.random() < 0.50) {
-          clusterItems.push({
-            x: cx + xOffset + (Math.random() - 0.5) * 6,
-            y: cy + dripLength + tipRadius * 1.35,
-            targetRadius: tipRadius * 0.45,
-            initialRadius: tipRadius * 0.12
-          });
-        }
       }
 
-      // 3. Upward & Diagonal Splash Horns
-      const numHorns = 2 + Math.floor(Math.random() * 2);
+      // 3. Upward & Diagonal Splash Tendrils (firmly attached)
+      const numHorns = 2;
       for (let j = 0; j < numHorns; j++) {
         const hornAngle =
-          -Math.PI * 0.5 + (j === 0 ? -0.75 : 0.75) + (Math.random() - 0.5) * 0.35;
-        const hornLength = baseRadius * (0.65 + Math.random() * 0.68);
-        const hornRadius = baseRadius * (0.24 + Math.random() * 0.12);
+          -Math.PI * 0.5 + (j === 0 ? -0.65 : 0.65) + (Math.random() - 0.5) * 0.2;
+        const hornLength = baseRadius * (0.45 + Math.random() * 0.35);
+        const hornRadius = baseRadius * (0.32 + Math.random() * 0.10);
 
-        // Mid-horn bridge
+        // Mid-horn bridge (thick enough to remain 100% attached)
         clusterItems.push({
-          x: cx + Math.cos(hornAngle) * hornLength * 0.5,
-          y: cy + Math.sin(hornAngle) * hornLength * 0.5,
-          targetRadius: baseRadius * 0.28,
-          initialRadius: baseRadius * 0.12
+          x: cx + Math.cos(hornAngle) * hornLength * 0.55,
+          y: cy + Math.sin(hornAngle) * hornLength * 0.55,
+          targetRadius: baseRadius * 0.38,
+          initialRadius: baseRadius * 0.18
         });
 
         // Horn tip
@@ -323,7 +278,7 @@ const LiquidInkBackground = () => {
           x: cx + Math.cos(hornAngle) * hornLength,
           y: cy + Math.sin(hornAngle) * hornLength,
           targetRadius: hornRadius,
-          initialRadius: hornRadius * 0.2
+          initialRadius: hornRadius * 0.22
         });
       }
 
