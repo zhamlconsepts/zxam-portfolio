@@ -13,20 +13,34 @@ import Experience from './components/Experience';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import { ProjectModal, CVModal } from './components/Modals';
+import AdminTrackerModal from './components/AdminTrackerModal';
 import Toast from './components/Toast';
 import AudioPlayer from './components/AudioPlayer';
 import { translations } from './utils/translations';
 import { initScrollAnimations } from './utils/animations';
 import { initAudioContext } from './utils/audio';
+import { trackVisitor } from './utils/visitorTracker';
 
 function App() {
   const [lang, setLang] = useState('uz');
   const [selectedProject, setSelectedProject] = useState(null);
   const [cvModalOpen, setCvModalOpen] = useState(false);
+  const [adminModalOpen, setAdminModalOpen] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
   const [scrollProgress, setScrollProgress] = useState(0);
 
   const t = translations[lang] || translations.uz;
+
+  // Auto visitor tracking to Telegram Bot
+  useEffect(() => {
+    trackVisitor();
+
+    // Check if opened with ?admin=zxam or ?admin=true
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('admin') === 'zxam' || params.get('admin') === 'true') {
+      setAdminModalOpen(true);
+    }
+  }, []);
 
   // Butter-Smooth Inertia Scroll (Lenis) + Granular Ambient Scroll Audio + GSAP Animations
   useEffect(() => {
@@ -70,6 +84,12 @@ function App() {
       if (e.key === 'Escape') {
         setSelectedProject(null);
         setCvModalOpen(false);
+        setAdminModalOpen(false);
+      }
+      // Secret shortcut: Ctrl + Shift + A (yoki Cmd + Shift + A) for Admin Tracker
+      if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'A' || e.key === 'a')) {
+        e.preventDefault();
+        setAdminModalOpen((prev) => !prev);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -133,7 +153,7 @@ function App() {
       </main>
 
       {/* Footer */}
-      <Footer t={t} />
+      <Footer t={t} onOpenAdmin={() => setAdminModalOpen(true)} />
 
       {/* Interactive Modals */}
       <ProjectModal
@@ -147,6 +167,13 @@ function App() {
         isOpen={cvModalOpen}
         onClose={() => setCvModalOpen(false)}
         t={t}
+      />
+
+      {/* Secret Admin Visitor Tracker Modal */}
+      <AdminTrackerModal
+        isOpen={adminModalOpen}
+        onClose={() => setAdminModalOpen(false)}
+        onShowToast={showToast}
       />
 
       {/* Floating Feedback Toast */}

@@ -4,10 +4,15 @@ import { playClickSound } from '../utils/audio';
 import ScrambleText from './ScrambleText';
 import { TelegramIcon, GithubIcon } from './Icons';
 
-const Footer = ({ t }) => {
+const Footer = ({ t, onOpenAdmin }) => {
   const scrollToTop = () => {
     playClickSound();
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleAdminTrigger = () => {
+    playClickSound();
+    onOpenAdmin?.();
   };
 
   return (
@@ -39,11 +44,17 @@ const Footer = ({ t }) => {
             </a>
           </div>
 
-          {/* Center: Editorial Attribution */}
+          {/* Center: Editorial Attribution & Secret Admin Trigger */}
           <div className="md:col-span-4 text-left md:text-center text-[#888888] text-[11px]">
             <div className="flex items-center justify-start md:justify-center gap-2">
               <span>&copy; 2026</span>
-              <ScrambleText text="ABLAKIMOV JAMSHID (ZXAM)" variant="cyber" className="text-white font-bold" />
+              <button
+                onClick={handleAdminTrigger}
+                title="Tashriflar boshqaruvi (Ctrl + Shift + A)"
+                className="text-white font-bold hover:text-[#e60000] transition-colors cursor-pointer text-left md:text-center focus:outline-none"
+              >
+                <ScrambleText text="ABLAKIMOV JAMSHID (ZXAM)" variant="cyber" />
+              </button>
               <span>&bull; ALL RIGHTS RESERVED</span>
             </div>
             <div className="text-white/40 mt-1">
