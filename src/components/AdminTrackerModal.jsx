@@ -3,7 +3,7 @@ import { X, Send, ShieldCheck, UserCheck, Smartphone, MapPin, Clock, Key, Copy, 
 import { sendTelegramNotification, getLocalVisitorHistory, trackVisitor } from '../utils/visitorTracker';
 import { playClickSound, playSuccessSound } from '../utils/audio';
 
-const SECRET_PIN = '7777';
+const SECRET_PIN = '1108';
 
 const AdminTrackerModal = ({ isOpen, onClose, onShowToast }) => {
   const [isUnlocked, setIsUnlocked] = useState(false);
@@ -127,7 +127,7 @@ const AdminTrackerModal = ({ isOpen, onClose, onShowToast }) => {
                 XAVFSIZLIK PAROLI
               </h4>
               <p className="text-xs text-zinc-400 mt-1 font-sans">
-                Boshqaruv paneliga kirish uchun maxfiy kodni kiriting (Standart kod: <code className="text-[#e60000] font-mono">7777</code>)
+                Boshqaruv paneliga kirish uchun maxfiy kodni kiriting
               </p>
             </div>
 
@@ -137,7 +137,7 @@ const AdminTrackerModal = ({ isOpen, onClose, onShowToast }) => {
                 maxLength={8}
                 value={pinInput}
                 onChange={(e) => { setPinInput(e.target.value); setPinError(false); }}
-                placeholder="PIN kod: 7777"
+                placeholder="••••"
                 autoFocus
                 className="w-full bg-[#14141a] border border-white/20 focus:border-[#e60000] rounded-lg px-4 py-2.5 text-center font-mono text-base tracking-widest text-white focus:outline-none"
               />
