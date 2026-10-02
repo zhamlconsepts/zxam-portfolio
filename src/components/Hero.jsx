@@ -211,17 +211,17 @@ const Hero = ({ onOpenCV, t }) => {
             <div className="absolute top-12 w-80 h-80 sm:w-[420px] sm:h-[420px] rounded-full bg-[#e60000]/25 blur-[120px] pointer-events-none" />
 
             {/* Jamshid Portrait - Zoomed In (scale-120/125), High-Definition & Fully Clear */}
-            <div className="relative w-full max-w-md sm:max-w-lg lg:max-w-xl flex justify-center lg:justify-end overflow-visible">
+            <div className="relative w-full max-w-md sm:max-w-lg lg:max-w-xl flex justify-center lg:justify-center overflow-visible pr-0 sm:pr-4">
               
               {/* Giant Red "ZXAM" Typographic Backdrop Behind Portrait */}
               <div 
-                className="absolute top-[36%] sm:top-[38%] left-1/2 lg:left-[52%] -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none select-none flex flex-col items-center justify-center w-full"
+                className="absolute top-[28%] sm:top-[30%] lg:top-[32%] left-[46%] sm:left-[47%] lg:left-[48%] -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none select-none flex flex-col items-center justify-center"
                 aria-hidden="true"
               >
-                <span className="font-editorial font-black text-[#e60000] text-[130px] sm:text-[180px] md:text-[230px] lg:text-[260px] xl:text-[310px] leading-none tracking-tighter uppercase select-none drop-shadow-[0_0_55px_rgba(230,0,0,0.9)] scale-y-105">
+                <span className="font-editorial font-black text-[#e60000] text-[115px] sm:text-[155px] md:text-[195px] lg:text-[220px] xl:text-[245px] leading-none tracking-tight uppercase select-none drop-shadow-[0_0_55px_rgba(230,0,0,0.95)] drop-shadow-[0_0_20px_rgba(230,0,0,0.85)] scale-y-105 whitespace-nowrap">
                   ZXAM
                 </span>
-                <span className="font-mono text-[11px] sm:text-xs text-[#e60000]/90 tracking-[0.35em] uppercase -mt-3 sm:-mt-5 font-bold drop-shadow-[0_0_12px_rgba(230,0,0,0.8)]">
+                <span className="font-mono text-[10px] sm:text-xs text-[#e60000] tracking-[0.4em] uppercase -mt-2 sm:-mt-4 font-bold drop-shadow-[0_0_12px_rgba(230,0,0,0.9)]">
                   // IDENTITY: ZXAM
                 </span>
               </div>
