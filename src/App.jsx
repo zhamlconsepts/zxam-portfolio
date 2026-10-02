@@ -56,11 +56,12 @@ function App() {
     window.addEventListener('wheel', handleFirstGesture, { passive: true });
 
     const lenis = new Lenis({
-      duration: 1.25,
+      duration: 1.15,
       easing: (val) => Math.min(1, 1.001 - Math.pow(2, -10 * val)),
       smoothWheel: true,
-      wheelMultiplier: 1.08,
-      touchMultiplier: 1.5
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.0,
+      syncTouch: false, // Prevents Lenis from fighting native mobile touch physics
     });
 
     let cleanupAnimations = () => {};

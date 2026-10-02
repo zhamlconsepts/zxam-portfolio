@@ -29,22 +29,35 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Complete elimination of native OS cursor & accidental text selection boxes */
-  html, body, #root, #app-root, *, *::before, *::after {
-    cursor: none !important;
-    -webkit-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-    user-select: none !important;
-    -webkit-touch-callout: none !important;
-    -webkit-user-drag: none !important;
+  /* Complete elimination of native OS cursor & accidental text selection boxes on desktop */
+  @media (hover: hover) and (pointer: fine) {
+    html, body, #root, #app-root, *, *::before, *::after {
+      cursor: none !important;
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      user-select: none !important;
+      -webkit-touch-callout: none !important;
+      -webkit-user-drag: none !important;
+    }
+
+    input, textarea {
+      cursor: none !important;
+      -webkit-user-select: text !important;
+      user-select: text !important;
+    }
   }
 
-  /* Keep input fields operable */
-  input, textarea {
-    cursor: none !important;
-    -webkit-user-select: text !important;
-    user-select: text !important;
+  /* Native touch behavior on mobile phones and tablets */
+  @media (hover: none) and (pointer: coarse) {
+    html, body, #root, #app-root, * {
+      cursor: auto !important;
+      -webkit-tap-highlight-color: transparent;
+    }
+    input, textarea {
+      -webkit-user-select: text !important;
+      user-select: text !important;
+    }
   }
 
   ::selection {

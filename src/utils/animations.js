@@ -17,17 +17,21 @@ export const initScrollAnimations = (lenisInstance) => {
     gsap.ticker.add(tickerCallback);
     gsap.ticker.lagSmoothing(0);
 
-    // 2. Velocity-Sensitive Physics Connection (daqconsulting.com inspired)
-    scrollVelocityCallback = ({ velocity }) => {
-      const clampedSkew = Math.max(-2.5, Math.min(2.5, velocity * 0.035));
-      gsap.to('.velocity-skew', {
-        skewY: clampedSkew,
-        duration: 0.28,
-        ease: 'power2.out',
-        overwrite: 'auto'
-      });
-    };
-    lenisInstance.on('scroll', scrollVelocityCallback);
+    // 2. Velocity-Sensitive Physics Connection (Only on desktop to eliminate mobile jitter)
+    const isMobile = typeof window !== 'undefined' && (window.innerWidth < 768 || window.matchMedia('(hover: none) and (pointer: coarse)').matches);
+
+    if (!isMobile) {
+      scrollVelocityCallback = ({ velocity }) => {
+        const clampedSkew = Math.max(-1.5, Math.min(1.5, velocity * 0.02));
+        gsap.to('.velocity-skew', {
+          skewY: clampedSkew,
+          duration: 0.25,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+      };
+      lenisInstance.on('scroll', scrollVelocityCallback);
+    }
   }
 
   // 3. Immediate Hero Entrance Animation (Runs on mount, no scroll needed!)
