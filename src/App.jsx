@@ -16,6 +16,7 @@ import { ProjectModal, CVModal } from './components/Modals';
 import AdminTrackerModal from './components/AdminTrackerModal';
 import Toast from './components/Toast';
 import AudioPlayer from './components/AudioPlayer';
+import LoadingScreen from './components/LoadingScreen';
 import { translations } from './utils/translations';
 import { initScrollAnimations } from './utils/animations';
 import { initAudioContext } from './utils/audio';
@@ -116,6 +117,9 @@ function App() {
       id="app-root"
       className="relative min-h-screen bg-[#08080a] text-[#ffffff] overflow-x-hidden selection:bg-[#e60000] selection:text-[#ffffff] transition-colors duration-700"
     >
+      {/* 3x3 Minimalist Cyber Preloader */}
+      <LoadingScreen />
+
       {/* Scroll Progress Bar at very top */}
       <div
         className="fixed top-0 left-0 right-0 h-[2.5px] z-50 transition-all duration-75 pointer-events-none bg-[#e60000] shadow-[0_0_12px_rgba(230,0,0,0.8)]"
