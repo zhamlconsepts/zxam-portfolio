@@ -209,7 +209,7 @@ const Hero = ({ onOpenCV, t }) => {
           {/* Right Column: Jamshid Portrait - Oq Neon Silhouette with Liquid Hover Reveal to Full Color */}
           <div className="hero-portrait-entry lg:col-span-6 xl:col-span-6 relative flex flex-col justify-center items-center z-40 velocity-skew will-change-transform">
             {/* Ambient backlight */}
-            <div className="absolute top-12 w-80 h-80 sm:w-[420px] sm:h-[420px] rounded-full bg-[#e60000]/25 blur-[120px] pointer-events-none" />
+            <div className="absolute top-10 w-96 h-96 sm:w-[500px] sm:h-[500px] rounded-full bg-[#e60000]/20 blur-[140px] pointer-events-none" />
 
             {/* Oq Neon Silhouette with Liquid Hover Reveal to Full Color (Natural Scale, Zero Zoom) */}
             <NeonLiquidPortrait />
