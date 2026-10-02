@@ -1,10 +1,10 @@
 import React from 'react';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Star } from 'lucide-react';
 import { playClickSound } from '../utils/audio';
 import ScrambleText from './ScrambleText';
 import { TelegramIcon, GithubIcon } from './Icons';
 
-const Footer = ({ t, onOpenAdmin }) => {
+const Footer = ({ t, onOpenAdmin, onOpenRating }) => {
   const scrollToTop = () => {
     playClickSound();
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -53,8 +53,22 @@ const Footer = ({ t, onOpenAdmin }) => {
             </div>
           </div>
 
-          {/* Right: Back to Top */}
+          {/* Right: Rating Trigger & Back to Top */}
           <div className="md:col-span-3 flex flex-wrap items-center justify-start md:justify-end gap-3">
+            {onOpenRating && (
+              <button
+                onClick={() => {
+                  playClickSound();
+                  onOpenRating();
+                }}
+                className="flex items-center gap-1.5 px-4 py-3 border border-amber-500/30 hover:border-amber-400 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 hover:text-white transition-all cursor-pointer font-bold tracking-widest text-[11px]"
+                title="Saytga o'z bahoingizni qoldiring"
+              >
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                <span>BAHOLASH</span>
+              </button>
+            )}
+
             <button
               onClick={scrollToTop}
               className="group flex items-center gap-2 px-5 py-3 border border-white/20 hover:border-[#e60000] hover:bg-[#e60000] hover:text-white text-white transition-all cursor-pointer font-bold tracking-widest"

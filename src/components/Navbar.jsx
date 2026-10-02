@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Volume2, VolumeX, Menu, X, FileText, ArrowUpRight } from 'lucide-react';
+import { Volume2, VolumeX, Menu, X, FileText, ArrowUpRight, Star } from 'lucide-react';
 import { playClickSound, setSoundEnabled, playHoverSound } from '../utils/audio';
 import ScrambleText from './ScrambleText';
 import { TelegramIcon, GithubIcon } from './Icons';
 
-const Navbar = ({ lang, setLang, t, onOpenCV }) => {
+const Navbar = ({ lang, setLang, t, onOpenCV, onOpenRating }) => {
   const [soundOn, setSoundOn] = useState(true);
   const [activeSection, setActiveSection] = useState('hero');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -123,6 +123,20 @@ const Navbar = ({ lang, setLang, t, onOpenCV }) => {
                 className="text-[#888888] hover:text-[#e60000] transition-colors tracking-widest cursor-pointer text-right uppercase"
               >
                 <ScrambleText text={lang === 'uz' ? '[ REZYUME / CV ]' : lang === 'ru' ? '[ РЕЗЮМЕ / CV ]' : '[ CV / RESUME ]'} variant="bracket" />
+              </button>
+            )}
+
+            {onOpenRating && (
+              <button
+                onClick={() => {
+                  playClickSound();
+                  onOpenRating();
+                }}
+                className="text-amber-400 hover:text-white transition-colors tracking-widest cursor-pointer text-right uppercase flex items-center gap-1.5 self-end group"
+                title="Saytga o'z bahoingizni qoldiring"
+              >
+                <span className="text-[#e60000]">⭐️</span>
+                <ScrambleText text={lang === 'uz' ? '[ BAHOLASH ]' : lang === 'ru' ? '[ ОЦЕНИТЬ ]' : '[ RATE SITE ]'} variant="bracket" />
               </button>
             )}
 
@@ -251,13 +265,31 @@ const Navbar = ({ lang, setLang, t, onOpenCV }) => {
                 setMobileMenuOpen(false);
                 onOpenCV();
               }}
-              className="w-full mt-4 py-4 px-5 rounded-xl border border-[#e60000]/40 bg-[#e60000]/10 text-white flex items-center justify-between font-mono text-xs uppercase tracking-widest font-bold"
+              className="w-full mt-4 py-3.5 px-5 rounded-xl border border-[#e60000]/40 bg-[#e60000]/10 text-white flex items-center justify-between font-mono text-xs uppercase tracking-widest font-bold"
             >
               <div className="flex items-center gap-2">
                 <FileText className="w-4 h-4 text-[#e60000]" />
                 <span>{lang === 'uz' ? 'REZYUME / CV KO\'RISH' : lang === 'ru' ? 'СМОТРЕТЬ РЕЗЮМЕ / CV' : 'VIEW CV / RESUME'}</span>
               </div>
               <ArrowUpRight className="w-4 h-4 text-[#e60000]" />
+            </button>
+          )}
+
+          {/* Mobile Rating Button */}
+          {onOpenRating && (
+            <button
+              onClick={() => {
+                playClickSound();
+                setMobileMenuOpen(false);
+                onOpenRating();
+              }}
+              className="w-full mt-2.5 py-3.5 px-5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-white flex items-center justify-between font-mono text-xs uppercase tracking-widest font-bold hover:bg-amber-500/20 transition-all cursor-pointer shadow-[0_0_15px_rgba(245,158,11,0.15)]"
+            >
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                <span>{lang === 'uz' ? '⭐️ PORTFOLIONI BAHOLASH' : lang === 'ru' ? '⭐️ ОЦЕНИТЬ ПОРТФОЛИО' : '⭐️ RATE PORTFOLIO'}</span>
+              </div>
+              <ArrowUpRight className="w-4 h-4 text-amber-400" />
             </button>
           )}
         </nav>

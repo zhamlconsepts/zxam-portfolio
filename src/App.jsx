@@ -14,6 +14,7 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import { ProjectModal, CVModal } from './components/Modals';
 import AdminTrackerModal from './components/AdminTrackerModal';
+import RatingModal from './components/RatingModal';
 import Toast from './components/Toast';
 import AudioPlayer from './components/AudioPlayer';
 import LoadingScreen from './components/LoadingScreen';
@@ -27,6 +28,7 @@ function App() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [cvModalOpen, setCvModalOpen] = useState(false);
   const [adminModalOpen, setAdminModalOpen] = useState(false);
+  const [ratingModalOpen, setRatingModalOpen] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
   const [scrollProgress, setScrollProgress] = useState(0);
 
@@ -46,7 +48,7 @@ function App() {
   }, []);
 
   // Modal open / close handling: pause background Lenis scroll and allow inner modal card scrolling
-  const isAnyModalOpen = Boolean(selectedProject || cvModalOpen || adminModalOpen);
+  const isAnyModalOpen = Boolean(selectedProject || cvModalOpen || adminModalOpen || ratingModalOpen);
   useEffect(() => {
     if (isAnyModalOpen) {
       lenisRef.current?.stop();
@@ -187,6 +189,7 @@ function App() {
         setLang={setLang}
         t={t}
         onOpenCV={() => setCvModalOpen(true)}
+        onOpenRating={() => setRatingModalOpen(true)}
       />
 
       {/* Main Editorial Content Flow */}
@@ -201,11 +204,11 @@ function App() {
         <Skills lang={lang} />
         <Projects onSelectProject={(p) => setSelectedProject(p)} lang={lang} t={t} />
         <Experience lang={lang} t={t} />
-        <Contact onShowToast={showToast} t={t} />
+        <Contact onShowToast={showToast} onOpenRating={() => setRatingModalOpen(true)} t={t} />
       </main>
 
       {/* Footer */}
-      <Footer t={t} onOpenAdmin={() => setAdminModalOpen(true)} />
+      <Footer t={t} onOpenAdmin={() => setAdminModalOpen(true)} onOpenRating={() => setRatingModalOpen(true)} />
 
       {/* Interactive Modals */}
       <ProjectModal
@@ -219,6 +222,14 @@ function App() {
         isOpen={cvModalOpen}
         onClose={() => setCvModalOpen(false)}
         t={t}
+      />
+
+      {/* Rating / Feedback Modal */}
+      <RatingModal
+        isOpen={ratingModalOpen}
+        onClose={() => setRatingModalOpen(false)}
+        onShowToast={showToast}
+        lang={lang}
       />
 
       {/* Secret Admin Visitor Tracker Modal */}

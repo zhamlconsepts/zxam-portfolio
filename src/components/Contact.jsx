@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Copy, Check, ArrowUpRight, Send, MapPin, Mail, Phone } from 'lucide-react';
+import { Copy, Check, ArrowUpRight, Send, MapPin, Mail, Phone, Star } from 'lucide-react';
 import { TelegramIcon, GithubIcon } from './Icons';
 import { playClickSound, playSuccessSound } from '../utils/audio';
 import ScrambleText from './ScrambleText';
 
-const Contact = ({ onShowToast, t }) => {
+const Contact = ({ onShowToast, onOpenRating, t }) => {
   const [formData, setFormData] = useState({ name: '', contact: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [copiedKey, setCopiedKey] = useState(null);
@@ -202,6 +202,31 @@ const Contact = ({ onShowToast, t }) => {
                 <span className="font-mono text-xs text-[#e60000] font-bold">( UZ )</span>
               </div>
             </div>
+
+            {/* Direct Rating & Feedback Banner */}
+            {onOpenRating && (
+              <div className="stagger-text p-4 sm:p-5 rounded-2xl bg-gradient-to-br from-amber-500/10 via-[#0d0d11] to-red-500/5 border border-amber-500/30 shadow-[0_0_25px_rgba(245,158,11,0.08)]">
+                <div className="flex items-center gap-2 text-amber-400 font-mono text-[11px] font-bold uppercase tracking-wider mb-1.5">
+                  <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
+                  <span>SAYT TAASSUROTLARI</span>
+                </div>
+                <p className="text-xs text-zinc-300 mb-3.5 leading-relaxed font-sans">
+                  Portfolio dizayni, tezligi va interaktivligiga o'z bahoingizni qoldiring.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    playClickSound();
+                    onOpenRating();
+                  }}
+                  className="w-full py-3 px-4 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 hover:border-amber-400 text-white font-mono text-xs uppercase font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg hover:scale-[1.02] active:scale-95"
+                >
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  <span>PORTFOLIONI BAHOLASH</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-amber-400" />
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Right Column: Transmission Form (7 cols) */}
