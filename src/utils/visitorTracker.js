@@ -79,34 +79,58 @@ const getDeviceInfo = () => {
   };
 };
 
-// URL parametrlarini tahlil qilish (?who=Ali, ?ref=telegram, ?utm_source=...)
+// URL parametrlarini tahlil qilish (?who=Ali, ?user=..., ?profile=..., ?ref=telegram, ?utm_source=...)
 const getUrlParameters = () => {
   const params = new URLSearchParams(window.location.search);
   const result = {};
   
-  if (params.get('who')) result.targetUser = params.get('who');
-  if (params.get('to')) result.targetUser = params.get('to');
-  if (params.get('name')) result.targetUser = params.get('name');
-  if (params.get('ref')) result.referrerSource = params.get('ref');
-  if (params.get('utm_source')) result.utmSource = params.get('utm_source');
-  if (params.get('from')) result.referrerSource = params.get('from');
+  const target = params.get('who') || 
+                 params.get('to') || 
+                 params.get('user') || 
+                 params.get('username') || 
+                 params.get('name') || 
+                 params.get('profile') || 
+                 params.get('client') || 
+                 params.get('target') || 
+                 params.get('for');
+
+  if (target) result.targetUser = decodeURIComponent(target);
+
+  const ref = params.get('ref') || 
+              params.get('from') || 
+              params.get('source') || 
+              params.get('src') || 
+              params.get('tgWebAppStartParam') ||
+              params.get('startapp');
+
+  if (ref) result.referrerSource = decodeURIComponent(ref);
+
+  if (params.get('utm_source')) result.utmSource = decodeURIComponent(params.get('utm_source'));
+  if (params.get('utm_medium')) result.utmMedium = decodeURIComponent(params.get('utm_medium'));
+  if (params.get('utm_campaign')) result.utmCampaign = decodeURIComponent(params.get('utm_campaign'));
 
   return result;
 };
 
-// Telegram WebApp (agar sayt Telegram ichida Mini App sifatida ochilsa)
+// Telegram WebApp (agar sayt Telegram ichida Mini App yoki WebApp sifatida ochilsa)
 const getTelegramWebAppUser = () => {
   try {
-    if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
-      const user = window.Telegram.WebApp.initDataUnsafe.user;
+    if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.ready?.();
+      
+      const user = tg.initDataUnsafe?.user;
+      const startParam = tg.initDataUnsafe?.start_param;
+
       if (user) {
         return {
           id: user.id,
           firstName: user.first_name || '',
           lastName: user.last_name || '',
           username: user.username ? `@${user.username}` : 'Mavjud emas',
-          isPremium: user.is_premium ? 'Ha (Telegram Premium ⭐)' : 'Yo\'q',
-          languageCode: user.language_code || 'uz',
+          isPremium: user.is_premium ? 'Ha ⭐ (Telegram Premium)' : 'Oddiy hisob',
+          languageCode: (user.language_code || 'uz').toUpperCase(),
+          startParam: startParam || null,
         };
       }
     }
@@ -114,6 +138,19 @@ const getTelegramWebAppUser = () => {
     console.error('Telegram WebApp parsing xatosi:', e);
   }
   return null;
+};
+
+// Tashrif manbasini (Referrer) aniqlash
+const getTrafficSource = (urlParams) => {
+  if (urlParams.referrerSource) return urlParams.referrerSource;
+  const ref = document.referrer;
+  if (!ref) return 'To\'g\'ridan-to\'g\'ri (Direct / Telegram Chat / Messenger)';
+  if (ref.includes('t.me') || ref.includes('telegram')) return 'Telegram Messenger';
+  if (ref.includes('instagram.com')) return 'Instagram';
+  if (ref.includes('linkedin.com')) return 'LinkedIn';
+  if (ref.includes('github.com')) return 'GitHub';
+  if (ref.includes('google.com')) return 'Google Qidiruv';
+  return ref;
 };
 
 // Tezkor Geolocation olish (Timeout bilan, hech qachon bot xabarini to'xtatib qo'ymaydi)
@@ -214,6 +251,7 @@ export const trackVisitor = async (config = {}) => {
 
     const device = getDeviceInfo();
     const tgUser = getTelegramWebAppUser();
+    const trafficSource = getTrafficSource(urlParams);
     const geo = await fetchGeoLocation();
 
     // Tashrif vaqti (Toshkent vaqti)
@@ -227,50 +265,60 @@ export const trackVisitor = async (config = {}) => {
       second: '2-digit',
     });
 
-    // Go'zal va tushunarli Telegram xabari formatlash
-    let message = `🎯 <b>YANGI TASHRIF: zxam-portfolio.vercel.app</b> 🎯\n\n`;
+    // Aniq, chiroyli va to'liq Telegram xabari formatlash
+    let message = `🎯 <b>YANGI TASHRIF HISOBOTI</b> 🎯\n\n`;
 
-    // Agar Telegram WebApp orqali kirgan bo'lsa (Telegramdagi ism, username)
+    // 1. Profil Egasi
+    message += `👤 <b>Portfolio Egasi:</b> Ablakimov Jamshid (zxam)\n`;
+    message += `🌐 <b>Sayt:</b> https://zxam-portfolio.vercel.app/\n\n`;
+
+    // 2. Tashrif Buyuruvchi Shaxsi / Profili
     if (tgUser) {
-      message += `👤 <b>Telegram Foydalanuvchi:</b>\n`;
-      message += `├ <b>Ism:</b> ${tgUser.firstName} ${tgUser.lastName}\n`;
-      message += `├ <b>Username:</b> ${tgUser.username}\n`;
-      message += `├ <b>Telegram ID:</b> <code>${tgUser.id}</code>\n`;
-      message += `└ <b>Premium:</b> ${tgUser.isPremium}\n\n`;
+      message += `⭐️ <b>Tashrif Buyuruvchi Telegram Profili:</b>\n`;
+      message += `├ 👤 <b>Ism:</b> ${tgUser.firstName} ${tgUser.lastName}\n`;
+      message += `├ 🔗 <b>Username:</b> ${tgUser.username}\n`;
+      message += `├ 🆔 <b>Telegram ID:</b> <code>${tgUser.id}</code>\n`;
+      message += `├ 🌟 <b>Hisob turi:</b> ${tgUser.isPremium}\n`;
+      message += `└ 🌐 <b>Tili:</b> ${tgUser.languageCode}\n\n`;
     }
 
-    // Agar maxsus link orqali kirgan bo'lsa (?who=Ali yoki ?ref=telegram)
+    // 3. Maxsus Shaxsiy Link / Profil parametrlar
     if (urlParams.targetUser || urlParams.referrerSource || urlParams.utmSource) {
-      message += `🔗 <b>Maxsus Link Ma'lumotlari:</b>\n`;
+      message += `🎯 <b>Yo'naltirilgan Shaxs / Maxsus Link:</b>\n`;
       if (urlParams.targetUser) {
-        message += `├ <b>Kim uchun yuborilgan:</b> ⭐️ <b>${urlParams.targetUser}</b>\n`;
+        message += `├ 👤 <b>Kimga yuborilgan:</b> ⭐️ <b>${urlParams.targetUser}</b>\n`;
       }
       if (urlParams.referrerSource) {
-        message += `├ <b>Havola manbasi:</b> <code>${urlParams.referrerSource}</code>\n`;
+        message += `├ 🔗 <b>Havola manbasi:</b> <code>${urlParams.referrerSource}</code>\n`;
       }
       if (urlParams.utmSource) {
-        message += `└ <b>UTM Source:</b> <code>${urlParams.utmSource}</code>\n`;
+        message += `└ 📊 <b>UTM Source:</b> <code>${urlParams.utmSource}</code>\n`;
       }
       message += `\n`;
+    } else if (!tgUser) {
+      message += `👥 <b>Tashrif Buyuruvchi:</b> Mehmon / Tashqi foydalanuvchi\n\n`;
     }
 
-    // Geolocation & Internet
+    // 4. Kirish Manbasi
+    message += `🔗 <b>Kirish Manbasi:</b> ${trafficSource}\n\n`;
+
+    // 5. Joylashuv & Tarmoq
     message += `📍 <b>Joylashuv & Tarmoq:</b>\n`;
-    message += `├ <b>Shahar / Davlat:</b> ${geo.city || 'Noma\'lum'}, ${geo.country || 'O\'zbekiston'} ${geo.countryCode ? `(${geo.countryCode})` : ''}\n`;
-    message += `├ <b>IP Manzil:</b> <code>${geo.ip}</code>\n`;
-    message += `└ <b>Provayder (ISP):</b> ${geo.org || 'Aniqlanmadi'}\n\n`;
+    message += `├ 🏙 <b>Shahar / Davlat:</b> ${geo.city || 'Noma\'lum'}, ${geo.country || 'O\'zbekiston'} ${geo.countryCode ? `(${geo.countryCode})` : ''}\n`;
+    message += `├ 🌐 <b>IP Manzil:</b> <code>${geo.ip}</code>\n`;
+    message += `└ 📡 <b>Provayder (ISP):</b> ${geo.org || 'Aniqlanmadi'}\n\n`;
 
-    // Qurilma va Brauzer
-    message += `📱 <b>Qurilma & Brauzer:</b>\n`;
-    message += `├ <b>Qurilma:</b> ${device.device}\n`;
-    message += `├ <b>Tizim (OS):</b> ${device.os}\n`;
-    message += `├ <b>Brauzer:</b> ${device.browser}\n`;
-    message += `├ <b>Ekran:</b> ${device.screen} (Viewport: ${device.viewport})\n`;
-    message += `└ <b>Tili:</b> ${device.language}\n\n`;
+    // 6. Qurilma va Brauzer
+    message += `📱 <b>Qurilma & Tizim:</b>\n`;
+    message += `├ 📱 <b>Qurilma:</b> ${device.device}\n`;
+    message += `├ 💻 <b>Tizim (OS):</b> ${device.os}\n`;
+    message += `├ 🌐 <b>Brauzer:</b> ${device.browser}\n`;
+    message += `├ 🖥 <b>Ekran:</b> ${device.screen} (Viewport: ${device.viewport})\n`;
+    message += `└ 🗣 <b>Tizim Tili:</b> ${device.language}\n\n`;
 
-    // Havola va Vaqt
-    message += `🕒 <b>Vaqt:</b> ${timeString} (Toshkent)\n`;
-    message += `🌐 <b>Ochilgan sahifa:</b> <code>${window.location.href}</code>`;
+    // 7. Vaqt va To'liq Havola
+    message += `🕒 <b>Vaqt:</b> ${timeString} (Toshkent vaqti)\n`;
+    message += `🌐 <b>Ochilgan havola:</b> <code>${window.location.href}</code>`;
 
     // Telegramga yuborish
     const sendResult = await sendTelegramNotification(message, config);

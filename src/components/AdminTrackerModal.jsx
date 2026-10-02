@@ -63,7 +63,10 @@ const AdminTrackerModal = ({ isOpen, onClose, onShowToast }) => {
   const handleTestBot = async () => {
     playClickSound();
     setIsTesting(true);
-    const testMsg = `✅ <b>Sinov Xabari!</b>\n\n🎯 <b>zxam-portfolio.vercel.app</b> saytidan Telegram botingiz muvaffaqiyatli ulandi!\nEndi saytga kim kirsa, barcha ma'lumotlar to'g'ridan-to'g'ri shu yerga keladi.`;
+    const testMsg = `✅ <b>Sinov Xabari!</b>\n\n` +
+      `👤 <b>Portfolio Egasi:</b> Ablakimov Jamshid (@zxam)\n` +
+      `🎯 <b>zxam-portfolio.vercel.app</b> saytidan Telegram botingiz muvaffaqiyatli ulandi!\n\n` +
+      `Endi saytga kim kirsa, uning Telegram profili yoki maxsus yo'naltirilgan ismi, manzili va barcha ma'lumotlari to'liq shu yerga keladi.`;
     
     const res = await sendTelegramNotification(testMsg, {
       BOT_TOKEN: botToken.trim(),
