@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowUp } from 'lucide-react';
+import { ArrowUp, Lock } from 'lucide-react';
 import { playClickSound } from '../utils/audio';
 import ScrambleText from './ScrambleText';
 import { TelegramIcon, GithubIcon } from './Icons';
@@ -8,11 +8,6 @@ const Footer = ({ t, onOpenAdmin }) => {
   const scrollToTop = () => {
     playClickSound();
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleAdminTrigger = () => {
-    playClickSound();
-    onOpenAdmin?.();
   };
 
   return (
@@ -44,26 +39,35 @@ const Footer = ({ t, onOpenAdmin }) => {
             </a>
           </div>
 
-          {/* Center: Editorial Attribution & Secret Admin Trigger */}
+          {/* Center: Clean Editorial Attribution */}
           <div className="md:col-span-4 text-left md:text-center text-[#888888] text-[11px]">
             <div className="flex items-center justify-start md:justify-center gap-2">
               <span>&copy; 2026</span>
-              <button
-                onClick={handleAdminTrigger}
-                title="Tashriflar boshqaruvi (Ctrl + Shift + A)"
-                className="text-white font-bold hover:text-[#e60000] transition-colors cursor-pointer text-left md:text-center focus:outline-none"
-              >
+              <span className="text-white font-bold">
                 <ScrambleText text="ABLAKIMOV JAMSHID (ZXAM)" variant="cyber" />
-              </button>
+              </span>
               <span>&bull; ALL RIGHTS RESERVED</span>
             </div>
-            <div className="text-white/40 mt-1">
+            <div className="text-white/40 mt-1 flex items-center justify-start md:justify-center gap-2">
               <ScrambleText text="REACT // TAILWIND CSS // VITE // DESIGN SYSTEM" variant="tech" />
             </div>
           </div>
 
-          {/* Right: Back to Top */}
-          <div className="md:col-span-3 flex justify-start md:justify-end">
+          {/* Right: Back to Top & Dedicated Secret Tracker Button */}
+          <div className="md:col-span-3 flex flex-wrap items-center justify-start md:justify-end gap-3">
+            <button
+              onClick={() => {
+                playClickSound();
+                onOpenAdmin?.();
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-3 border border-white/10 hover:border-[#e60000]/60 bg-white/[0.02] hover:bg-[#e60000]/10 text-zinc-500 hover:text-[#e60000] transition-colors cursor-pointer text-[11px] font-mono rounded"
+              title="Yashirin Telemetriya va Bot boshqaruvi"
+              aria-label="Secret Telemetry Access"
+            >
+              <Lock className="w-3.5 h-3.5 text-[#e60000]" />
+              <span>ACCESS</span>
+            </button>
+
             <button
               onClick={scrollToTop}
               className="group flex items-center gap-2 px-5 py-3 border border-white/20 hover:border-[#e60000] hover:bg-[#e60000] hover:text-white text-white transition-all cursor-pointer font-bold tracking-widest"

@@ -3,18 +3,35 @@
  * Faqat sizga (Telegram botingizga) saytga kirganlar haqida to'liq hisobot yuboradi.
  */
 
-// SOZLAMALAR: O'zingizning Telegram Bot Token va Chat ID'ingizni shu yerga yozing
-// Yoki .env faylidan VITE_TELEGRAM_BOT_TOKEN va VITE_TELEGRAM_CHAT_ID orqali o'qiladi
-export const getTrackerCredentials = () => ({
-  BOT_TOKEN: localStorage.getItem('zxam_tg_bot_token') || import.meta.env?.VITE_TELEGRAM_BOT_TOKEN || '',
-  CHAT_ID: localStorage.getItem('zxam_tg_chat_id') || import.meta.env?.VITE_TELEGRAM_CHAT_ID || '',
-  DEBOUNCE_MINUTES: 15,
-});
+// SOZLAMALAR:
+// 1. Agar Vercel Environment Variables qo'shilgan bo'lsa VITE_TELEGRAM_BOT_TOKEN va VITE_TELEGRAM_CHAT_ID o'qiladi.
+// 2. Sayt yashirin admin panelida saqlangan bo'lsa localStorage'dan o'qiladi.
+// 3. To'g'ridan-to'g'ri ishlashi uchun pastdagi DEFAULT_CONFIG ga ham kiritishingiz mumkin:
+const DEFAULT_CONFIG = {
+  BOT_TOKEN: '', // O'zingizning Bot Tokeningizni shu yerga ham yozib qo'yishingiz mumkin
+  CHAT_ID: '',   // O'zingizning Chat ID raqamingizni shu yerga ham yozib qo'yishingiz mumkin
+};
+
+export const getTrackerCredentials = () => {
+  const token = localStorage.getItem('zxam_tg_bot_token') || 
+                import.meta.env?.VITE_TELEGRAM_BOT_TOKEN || 
+                DEFAULT_CONFIG.BOT_TOKEN;
+                
+  const chatId = localStorage.getItem('zxam_tg_chat_id') || 
+                 import.meta.env?.VITE_TELEGRAM_CHAT_ID || 
+                 DEFAULT_CONFIG.CHAT_ID;
+
+  return {
+    BOT_TOKEN: token ? token.trim() : '',
+    CHAT_ID: chatId ? chatId.trim() : '',
+    DEBOUNCE_MINUTES: 2,
+  };
+};
 
 export const TRACKER_CONFIG = {
   BOT_TOKEN: import.meta.env?.VITE_TELEGRAM_BOT_TOKEN || '',
   CHAT_ID: import.meta.env?.VITE_TELEGRAM_CHAT_ID || '',
-  DEBOUNCE_MINUTES: 15,
+  DEBOUNCE_MINUTES: 2,
 };
 
 // Brauzer va Qurilma turini aniqlash
@@ -99,33 +116,54 @@ const getTelegramWebAppUser = () => {
   return null;
 };
 
-// IP va Geolocation ma'lumotlarini olish (bepul va xavfsiz API)
+// Tezkor Geolocation olish (Timeout bilan, hech qachon bot xabarini to'xtatib qo'ymaydi)
 const fetchGeoLocation = async () => {
+  const fetchWithTimeout = async (url, timeoutMs = 1500) => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (res.ok) return await res.json();
+    } catch {
+      // Timeout or error
+    }
+    return null;
+  };
+
   try {
-    const res = await fetch('https://ipapi.co/json/', { method: 'GET' });
-    if (res.ok) {
-      const data = await res.json();
+    // 1-urinish: ipwho.is (Juda tez va limitsiz)
+    const ipWhoisData = await fetchWithTimeout('https://ipwho.is/');
+    if (ipWhoisData && ipWhoisData.success !== false) {
       return {
-        ip: data.ip || 'Noma\'lum',
-        city: data.city || 'Noma\'lum',
-        region: data.region || 'Noma\'lum',
-        country: data.country_name || 'Noma\'lum',
-        countryCode: data.country_code || '',
-        org: data.org || data.asn || 'Internet Provayder',
-        timezone: data.timezone || 'Asia/Tashkent',
+        ip: ipWhoisData.ip || 'Noma\'lum',
+        city: ipWhoisData.city || 'Noma\'lum',
+        region: ipWhoisData.region || 'Noma\'lum',
+        country: ipWhoisData.country || 'O\'zbekiston',
+        countryCode: ipWhoisData.country_code || 'UZ',
+        org: ipWhoisData.connection?.isp || ipWhoisData.connection?.org || 'Internet Provayder',
+        timezone: ipWhoisData.timezone?.id || 'Asia/Tashkent',
       };
     }
-  } catch (err) {
-    // Fallback: ipify
-    try {
-      const fallbackRes = await fetch('https://api.ipify.org?format=json');
-      const fallbackData = await fallbackRes.json();
-      return { ip: fallbackData.ip, city: 'Aniqlanmadi', country: 'O\'zbekiston/Global' };
-    } catch {
-      // Ignored
+
+    // 2-urinish: ipapi.co
+    const ipApiData = await fetchWithTimeout('https://ipapi.co/json/');
+    if (ipApiData && ipApiData.ip) {
+      return {
+        ip: ipApiData.ip || 'Noma\'lum',
+        city: ipApiData.city || 'Noma\'lum',
+        region: ipApiData.region || 'Noma\'lum',
+        country: ipApiData.country_name || 'O\'zbekiston',
+        countryCode: ipApiData.country_code || 'UZ',
+        org: ipApiData.org || 'Internet Provayder',
+        timezone: ipApiData.timezone || 'Asia/Tashkent',
+      };
     }
+  } catch {
+    // Fallback
   }
-  return { ip: 'Yashirin/Lokal', city: 'Aniqlanmadi', country: 'Aniqlanmadi' };
+
+  return { ip: 'Yashirin / Mobil Tarmoq', city: 'Aniqlanmadi', country: 'O\'zbekiston/Global', countryCode: 'UZ' };
 };
 
 // Telegram Botga xabar yuborish
@@ -135,7 +173,7 @@ export const sendTelegramNotification = async (messageText, customConfig = {}) =
   const chatId = customConfig.CHAT_ID || creds.CHAT_ID;
 
   if (!token || !chatId) {
-    console.warn('⚠️ [VisitorTracker] Telegram BOT_TOKEN yoki CHAT_ID kiritilmagan. Bot xabari yuborilmadi.');
+    console.warn('⚠️ [VisitorTracker] Telegram BOT_TOKEN yoki CHAT_ID kiritilmagan. Admin panelida Token va Chat ID kiriting.');
     return { success: false, reason: 'credentials_missing' };
   }
 
@@ -162,17 +200,19 @@ export const sendTelegramNotification = async (messageText, customConfig = {}) =
 // Asosiy Tashrif Kuzatuvchisini Ishga Tushirish
 export const trackVisitor = async (config = {}) => {
   try {
+    const urlParams = getUrlParameters();
+    const hasSpecialLink = Boolean(urlParams.targetUser || urlParams.referrerSource || urlParams.utmSource);
+
+    // Spamdan himoya: faqat oddiy qayta yuklashlar uchun 2 daqiqa. Maxsus link bo'lsa darhol yuboradi!
     const lastTrackTime = sessionStorage.getItem('zxam_last_track_time');
     const now = Date.now();
-    const debounceMs = (config.DEBOUNCE_MINUTES || TRACKER_CONFIG.DEBOUNCE_MINUTES) * 60 * 1000;
+    const debounceMs = 2 * 60 * 1000; // 2 daqiqa
 
-    // Spamdan himoya: agar yaqinda xabar yuborilgan bo'lsa qayta yubormaydi
-    if (lastTrackTime && now - parseInt(lastTrackTime, 10) < debounceMs) {
+    if (!hasSpecialLink && lastTrackTime && now - parseInt(lastTrackTime, 10) < debounceMs) {
       return;
     }
 
     const device = getDeviceInfo();
-    const urlParams = getUrlParameters();
     const tgUser = getTelegramWebAppUser();
     const geo = await fetchGeoLocation();
 
@@ -225,12 +265,12 @@ export const trackVisitor = async (config = {}) => {
     message += `├ <b>Qurilma:</b> ${device.device}\n`;
     message += `├ <b>Tizim (OS):</b> ${device.os}\n`;
     message += `├ <b>Brauzer:</b> ${device.browser}\n`;
-    message += `├ <b>Ekran o'lchami:</b> ${device.screen} (Viewport: ${device.viewport})\n`;
+    message += `├ <b>Ekran:</b> ${device.screen} (Viewport: ${device.viewport})\n`;
     message += `└ <b>Tili:</b> ${device.language}\n\n`;
 
     // Havola va Vaqt
     message += `🕒 <b>Vaqt:</b> ${timeString} (Toshkent)\n`;
-    message += `🌐 <b>Ochilgan sahifa:</b> ${window.location.href}`;
+    message += `🌐 <b>Ochilgan sahifa:</b> <code>${window.location.href}</code>`;
 
     // Telegramga yuborish
     const sendResult = await sendTelegramNotification(message, config);
@@ -254,7 +294,7 @@ export const trackVisitor = async (config = {}) => {
   }
 };
 
-// Tashrif buyuruvchi saytdagi muhim tugmalarni bosganda (masalan CV ko'rganda yoki loyihani ochganda) xabar yuborish
+// Tashrif buyuruvchi saytdagi muhim tugmalarni bosganda xabar yuborish
 export const trackUserAction = async (actionName, details = {}) => {
   try {
     const timeString = new Date().toLocaleString('uz-UZ', { timeZone: 'Asia/Tashkent' });
@@ -271,12 +311,11 @@ export const trackUserAction = async (actionName, details = {}) => {
   }
 };
 
-// Mahalliy loglar (faqat siz yashirin admin oynasida ko'rishingiz uchun)
+// Mahalliy loglar
 const saveToLocalVisitorHistory = (entry) => {
   try {
     const history = JSON.parse(localStorage.getItem('zxam_visitor_logs') || '[]');
     history.unshift(entry);
-    // Faqat oxirgi 50 tasini saqlaymiz
     if (history.length > 50) history.pop();
     localStorage.setItem('zxam_visitor_logs', JSON.stringify(history));
   } catch {
